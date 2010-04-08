@@ -1,0 +1,7 @@
+LaTeX package 'filehook'
+~~~~~~~~~~~~~~~~~~~~~~~~
+Copyright (c) 2010 by Martin Scharrer <martin@scharrer-online.de>
+WWW: http://latex.scharrer-online.de/
+
+Provides several file hooks for files read by \input, \include and \InputIfFileExists.
+
