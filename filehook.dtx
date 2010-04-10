@@ -169,6 +169,13 @@
 %
 % \StopEventually{}
 %
+% \section{Further Notes}
+% \subsection*{Listings}
+% The \pkg{listings} package uses |\input| inside \cs{lstinputlisting}. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
+% Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
+% environment), any further code read using any input macro (|\input|, |\@input|, |\@@input| (\TeX's |\input|), \ldots) will be processed verbatim and typeset
+% as part of the listing. A known package suffering from this is \pkg{svn-multi} which loads |.svx| files for every |.tex| file.
+%
 %
 % \section{Implementation}\label{sec:impl}
 %
