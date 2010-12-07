@@ -29,12 +29,12 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2010/04/08 v0.1 Hooks for input files]
+    [2010/12/06 v0.2 Hooks for input files]
 %</package>
 %
 %<*driver>
 \documentclass{ltxdoc}
-\usepackage{filehook}[2010/04/08]
+\usepackage{filehook}[2010/12/06]
 \usepackage{ifpdf}
 \usepackage{hyperref}
 \EnableCrossrefs
@@ -229,25 +229,8 @@
 % This macro is redefined for the general file hooks.
 % The original definition is not saved away and called by the new definition, because
 % of the existing complexity. The hooks must be places around the actual input macro (|\@@input|).
-% To be compatible with the similar \pkg{fink} package its code inserted into this macro is kept if the package
-% was loaded beforehand.
 %
 %    \begin{macrocode}
-\ifcase0%
-  \ifx\fink@input\@undefined 1\else
-  \ifx\fink@input\relax 1\fi\fi
-\relax
-\long\def\InputIfFileExists#1#2{%
-  \IfFileExists{#1}{%
-    #2\@addtofilelist{#1}%
-    \fink@prepare{#1}%
-    \filehook@atbegin{#1}%
-    \expandafter\fink@input%
-    \expandafter\fink@restore\expandafter{\finkpath}%
-    \filehook@atend{#1}%
-  }%
-}
-\else
 \long\def\InputIfFileExists#1#2{%
   \IfFileExists{#1}%
     {#2\@addtofilelist{#1}%
@@ -256,7 +239,6 @@
      \filehook@atend{#1}%
     }%
 }
-\fi
 %    \end{macrocode}
 % \end{macro}
 %
