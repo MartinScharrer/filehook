@@ -1,4 +1,5 @@
 PACKAGE=filehook
+MV=mv
 
 all: package doc
 
