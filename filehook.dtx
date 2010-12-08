@@ -49,7 +49,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{251}
+% \CheckSum{257}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -171,7 +171,9 @@
 %
 % \section{Compatibility Issues with other Packages}
 % This sections lists packages and classes which might cause issues when used together with |filehook|. In general all code which also redefines |\InputIfFileExists|
-% will cause trouble. Note that at the moment |filehook| simply redefines this macro to the original \LaTeX\ definition plus added hooks and any previous modifications
+% will cause trouble. 
+% The \LaTeX\ warning ``Command \cs{InputIfFileExists} has changed.'' will be triggered in this case.
+% Note that at the moment |filehook| simply redefines this macro to the original \LaTeX\ definition plus added hooks and any previous modifications
 % will be lost.
 %
 % \subsection*{listings}
@@ -247,9 +249,17 @@
 %
 % \begin{macro}{\InputIfFileExists}
 % This macro is redefined for the general file hooks.
-% The original definition is not saved away and called by the new definition, because
+% The original definition is checked but is not saved away and called by the new definition, because
 % of the existing complexity. The hooks must be places around the actual input macro (|\@@input|).
 %
+%    \begin{macrocode}
+\CheckCommand{\InputIfFileExists}[2]{%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}%
+     \@@input\@filef@und
+    }%
+}
+%    \end{macrocode}
 %    \begin{macrocode}
 \long\def\InputIfFileExists#1#2{%
   \IfFileExists{#1}%
