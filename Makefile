@@ -1,5 +1,6 @@
 PACKAGE=filehook
 MV=mv
+LATEX=pdflatex
 
 all: package doc
 
@@ -10,8 +11,12 @@ doc: ${PACKAGE}.pdf
 ${PACKAGE}.sty: ${PACKAGE}.ins ${PACKAGE}.dtx
 	yes | pdflatex $<
 
-${PACKAGE}.pdf: ${PACKAGE}.dtx ${PACKAGE}.sty
-	latexmk -pdf $<
+%.pdf: %.dtx %.sty
+	${LATEX} $*.dtx
+	-makeindex -s gind.ist -o $*.ind $*.idx
+	-makeindex -s gglo.ist -o $*.gls $*.glo
+	${LATEX} $*.dtx
+	${LATEX} $*.dtx
 
 ctanify: ${PACKAGE}.dtx ${PACKAGE}.ins ${PACKAGE}.pdf README Makefile
 	-pdfopt ${PACKAGE}.pdf temp.pdf && ${MV} temp.pdf ${PACKAGE}.pdf
@@ -19,4 +24,10 @@ ctanify: ${PACKAGE}.dtx ${PACKAGE}.ins ${PACKAGE}.pdf README Makefile
 
 clean:
 	latexmk -C ${PACKAGE}.dtx
+
+install: package doc
+	-@mkdir ${HOME}/texmf/tex/latex/currfile/ 2>/dev/null || true
+	cp ${PACKAGE}.sty ${HOME}/texmf/tex/latex/currfile/
+	cp ${PACKAGE}.pdf ${HOME}/texmf/tex/latex/currfile/
+	texhash ${HOME}/texmf
 
