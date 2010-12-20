@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1922 2010-12-20 22:00:05Z martin $
+%% $Id: filehook.dtx 1923 2010-12-20 22:30:49Z martin $
 % \fi
 %
 % \iffalse
@@ -109,14 +109,14 @@
 % using \Macro{AtBeginDocument}{<\TeX code>}.
 %
 % \section{Usage}
-% This package provides three groups of hooks: for file read using \Macro{input}, for files read using \Macro{include} and for all read files (i.e.\ all files read using
-% \Macro{InputIfFileExists}, which includes package and class files and files falling into the first two groups).
+% This package provides several groups of hooks: for file read using \Macro{input}, for files read using \Macro{include} and for all read files (i.e.\ all files read using
+% \Macro{InputIfFileExists}, which includes package and class files and files falling into the first two groups). Since v0.3 from 2010/12/20 there are also hooks for package and class files.
 % All groups include a `AtBegin' and a `AtEnd' macro. The \Macro{include} group has also a `After' hook which
 % it is executed \emph{after} the page break (\Macro{clearpage}) is inserted by the \Macro{include} code. In contrast, the `AtEnd' hook is executed before the trailing page break 
 % and the `AtBegin' hook is executed after the \emph{leading} page break.
 %
-% Each group includes general and file specific hooks. The general hooks are executed for every file of this group and provide the file name as argument |#1|.
-% The file specific ones are only executed for a certain file. 
+% The first three groups includes general and file specific hooks. The general hooks are executed for every file of this group and provide the file name as argument |#1|.
+% The file specific ones are only executed for a certain file. The package and class hocks are always specific to one file.
 %
 % The below macros can be used to add material (\TeX{} code) to the related hooks. All `AtBegin' macros will \emph{append} the code to the hooks, but the
 % `AtEnd' and `After' macros will \emph{prefix} the code instead. This ensures that two different packages adding material in `AtBegin'/`AtEnd' pairs do not
