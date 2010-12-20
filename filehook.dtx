@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1923 2010-12-20 22:30:49Z martin $
+%% $Id: filehook.dtx 1924 2010-12-20 22:49:39Z martin $
 % \fi
 %
 % \iffalse
@@ -240,6 +240,11 @@
 %<*package>
 % \fi
 %
+% \subsection{Options}
+\newif\iffilehook@force
+\DeclareOption{force}{\filehook@forcetrue}
+\ProcessOptions\relax
+%
 % \subsection{Installation of Hooks}
 % The \Macro{@input@} and \Macro{@iinput} macros from |latex.ltx| are redefined to install the hooks.
 %
@@ -379,9 +384,17 @@
 %    \begin{macrocode}
 \ifx\InputIfFileExists\latex@InputIfFileExists
 \else
-  \PackageWarning{filehook}
-    {Changed definition of \string\InputIfFileExists\space detected!^^J%
-    This macro will be redefined and this might break other packages or code.}%
+  \iffilehook@force
+    \PackageWarning{filehook}
+        {Changed definition of \string\InputIfFileExists\space detected!^^J%
+        The 'force' option is in effect and therefore this macros is redefined.
+        This might break other packages or code}%
+  \else
+    \PackageError{filehook}
+        {Changed definition of \string\InputIfFileExists\space detected!^^J%
+        Use the 'force' option to force the redefinition of this macro.^^J%
+        This might break other packages or code}%
+  \fi
 \fi
 \fi
 
