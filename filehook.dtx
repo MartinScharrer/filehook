@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1925 2010-12-20 23:03:20Z martin $
+%% $Id: filehook.dtx 1926 2010-12-20 23:11:20Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{401}
+% \CheckSum{422}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -71,7 +71,7 @@
 %
 % \changes{v0.1}{2010/04/08}{Initial version}
 % \changes{v0.2}{2010/12/08}{Added support for 'memoir' class and 'scrlfile' package. Remove support for deprecated 'fink' package.}
-% \changes{v0.3}{2010/12/20}{Added hooks for package and class files.}
+% \changes{v0.3}{2010/12/20}{Added hooks for package and class files. Changed a warning to an error and added the 'force' option to overwrite this.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -202,8 +202,9 @@
 % \section{Compatibility Issues with other Packages}
 % The |filehook| package might clash with other packages or classes which also redefine \Macro{InputIfFileExists}.
 % Special compatibility code is in place for the known packages listed below (in their current implementation).
-% If any other unknown definition is found a warning will be printed and the macro will be overwritten.
-% Any previous modifications will be lost, which will most likely break the other package.
+% If any other unknown definition is found an error will be raised. The package option `|force|' can be used
+% to prevent this and to force the redefinition of this macro.
+% Then any previous modifications will be lost, which will most likely break the other package.
 % Please do not hesitate to inform the author of |filehook| of any encountered problems with other packages.
 %
 % \subsection*{jmlrbook}
@@ -241,9 +242,11 @@
 % \fi
 %
 % \subsection{Options}
+%    \begin{macrocode}
 \newif\iffilehook@force
 \DeclareOption{force}{\filehook@forcetrue}
 \ProcessOptions\relax
+%    \end{macrocode}
 %
 % \subsection{Installation of Hooks}
 % The \Macro{@input@} and \Macro{@iinput} macros from |latex.ltx| are redefined to install the hooks.
