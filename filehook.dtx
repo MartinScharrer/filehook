@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1924 2010-12-20 22:49:39Z martin $
+%% $Id: filehook.dtx 1925 2010-12-20 23:03:20Z martin $
 % \fi
 %
 % \iffalse
@@ -384,6 +384,14 @@
 %    \begin{macrocode}
 \ifx\InputIfFileExists\latex@InputIfFileExists
 \else
+  \@ifpackageloaded{scrlfile}{%
+    \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists}%
+  }{}%
+
+  \@ifclassloaded{memoir}{%
+    \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists}%
+  }{}%
+
   \iffilehook@force
     \PackageWarning{filehook}
         {Changed definition of \string\InputIfFileExists\space detected!^^J%
