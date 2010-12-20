@@ -1,0 +1,58 @@
+%&pdflatex
+\RequirePackage{filehook}[2010/12/20]
+
+\AtBeginOfClassFile{test}{%
+    \message{^^JTEST: begin of class HOOK^^J}%
+}
+\AtEndOfClassFile{test}{%
+    \message{^^JTEST: end of class HOOK^^J}%
+}
+
+\AtBeginOfPackageFile{test}{%
+    \message{^^JTEST: begin of package HOOK^^J}%
+}
+\AtEndOfPackageFile{test}{%
+    \message{^^JTEST: end of package HOOK^^J}%
+}
+
+\documentclass{test}
+
+\usepackage{test}
+
+
+\AtEndOfPackageFile{test}{%
+    \message{^^JTEST: SHOULD NOT BE SHOWN: late end of package HOOK^^J}%
+}
+
+\AtEndOfClassFile{test}{%
+    \message{^^JTEST: SHOULD NOT BE SHOWN: late end of class HOOK^^J}%
+}
+
+\AtEndOfPackageFile*{test}{%
+    \message{^^JTEST: late end of package HOOK^^J}%
+}
+
+\AtEndOfClassFile*{test}{%
+    \message{^^JTEST: late end of class HOOK^^J}%
+}
+
+\listfiles
+\begin{document}
+
+\message{^^JTEST: begin of document^^J}
+
+A
+\newpage
+
+B
+\newpage
+
+C
+\newpage
+
+
+\message{^^JTEST: end of document^^J}
+
+\end{document}
+
+
