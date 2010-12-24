@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1926 2010-12-20 23:11:20Z martin $
+%% $Id: filehook.dtx 1934 2010-12-24 23:07:36Z martin $
 % \fi
 %
 % \iffalse
@@ -128,12 +128,12 @@
 % \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AfterIncludes}{<\TeX\ code>}
-% All these macro take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro{include}.
+% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro{include}.
 % The code can use the macro argument |#1|
 % which will be expanded to the include \meta{file name}, i.e.\ the hooks are macros with one argument which will be the file name.
 % As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro{clearpage}.
-% Material which should be (still) valid in the page header or footer of the last page of such an
-% file should therefore use the `After' hook. 
+% Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd` hook, to ensure
+% that the old values are still valid for the last page.
 %
 % \DescribeMacro{\AtBeginOfIncludeFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludeFile}{<file name>}{<\TeX\ code>}
@@ -146,12 +146,12 @@
 %
 % \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
-% Like the \Macro{...OfIncludes}\marg{code} macros above, just for file read using \Macro{input}. Again, the macro argument |#1| can be used inside the \meta{code} and
-% will be expanded to the <file name>.
+% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro{input}. Again, the macro argument |#1| can be used inside the \meta{code} and
+% will be expanded to the \meta{file name}.
 %
 % \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
-% Like the \Macro{...OfIncludeFile}\marg{<file name>}\marg{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
+% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
 %
 % \subsection*{All Files}
