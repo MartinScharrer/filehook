@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1936 2010-12-25 19:49:37Z martin $
+%% $Id: filehook.dtx 1937 2010-12-25 20:27:48Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{493}
+% \CheckSum{530}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -256,6 +256,7 @@
 % \begin{macro}{\filehook@include@atbegin}
 % \begin{macro}{\filehook@include@atend}
 % \begin{macro}{\filehook@include@after}
+% Note: |#1| always includes the |.tex| extension.
 %    \begin{macrocode}
 \def\filehook@include@atbegin#1{%
   \@nameuse{\filehook@include@atbegin@#1}%
@@ -275,10 +276,12 @@
 % \begin{macro}{\filehook@input@atend}
 %    \begin{macrocode}
 \def\filehook@input@atbegin#1{%
-  \@nameuse{\filehook@input@atbegin@#1}%
+  \filehook@parsefile{#1}%
+  \@nameuse{\filehook@input@atbegin@\filehook@filename}%
 }
 \def\filehook@input@atend#1{%
-  \@nameuse{\filehook@input@atend@#1}%
+  \filehook@parsefile{#1}%
+  \@nameuse{\filehook@input@atend@\filehook@filename}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -288,10 +291,12 @@
 % \begin{macro}{\filehook@atend}
 %    \begin{macrocode}
 \def\filehook@atbegin#1{%
-  \@nameuse{\filehook@atbegin@#1}%
+  \filehook@parsefile{#1}%
+  \@nameuse{\filehook@atbegin@\filehook@filename}%
 }
 \def\filehook@atend#1{%
-  \@nameuse{\filehook@atend@#1}%
+  \filehook@parsefile{#1}%
+  \@nameuse{\filehook@atend@\filehook@filename}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -363,6 +368,16 @@
     \edef\@tempa{\the\@temptokena\the\toks@}%
     \expandafter\gdef\expandafter#1\expandafter##\expandafter1\expandafter{\@tempa}%
   \endgroup
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@parsefile}
+% Parses filename using the \LaTeX\ macro and defines it with an extension added if required.
+%    \begin{macrocode}
+\def\filehook@parsefile#1{%
+  \filename@parse{#1}%
+  \edef\filehook@filename{\filename@area\filename@base.\ifx\filename@ext\relax tex\else\filename@ext\fi}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -444,9 +459,10 @@
 % \begin{macro}{\AtBeginOfInputFile}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfInputFile[1]{%
-  \@ifundefined{\filehook@input@atbegin@#1}%
-    {\long\global\@namedef{\filehook@input@atbegin@#1}}%
-    {\expandafter\filehook@append\csname\filehook@input@atbegin@#1\endcsname}%
+  \filehook@parsefile{#1}%
+  \@ifundefined{\filehook@input@atbegin@\filehook@filename}%
+    {\long\global\@namedef{\filehook@input@atbegin@\filehook@filename}}%
+    {\expandafter\filehook@append\csname\filehook@input@atbegin@\filehook@filename\endcsname}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -454,9 +470,10 @@
 % \begin{macro}{\AtEndOfInputFile}
 %    \begin{macrocode}
 \newcommand*\AtEndOfInputFile[1]{%
-  \@ifundefined{\filehook@input@atend@#1}%
-    {\long\global\@namedef{\filehook@input@atend@#1}}%
-    {\expandafter\filehook@prefix\csname\filehook@input@atend@#1\endcsname}%
+  \filehook@parsefile{#1}%
+  \@ifundefined{\filehook@input@atend@\filehook@filename}%
+    {\long\global\@namedef{\filehook@input@atend@\filehook@filename}}%
+    {\expandafter\filehook@prefix\csname\filehook@input@atend@\filehook@filename\endcsname}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -480,9 +497,10 @@
 % \begin{macro}{\AtBeginOfFile}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfFile[1]{%
-  \@ifundefined{\filehook@atbegin@#1}%
-    {\long\global\@namedef{\filehook@atbegin@#1}}%
-    {\expandafter\filehook@append\csname\filehook@atbegin@#1\endcsname}%
+  \filehook@parsefile{#1}%
+  \@ifundefined{\filehook@atbegin@\filehook@filename}%
+    {\long\global\@namedef{\filehook@atbegin@\filehook@filename}}%
+    {\expandafter\filehook@append\csname\filehook@atbegin@\filehook@filename\endcsname}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -490,9 +508,10 @@
 % \begin{macro}{\AtEndOfFile}
 %    \begin{macrocode}
 \newcommand*\AtEndOfFile[1]{%
-  \@ifundefined{\filehook@atend@#1}%
-    {\long\global\@namedef{\filehook@atend@#1}}%
-    {\expandafter\filehook@prefix\csname\filehook@atend@#1\endcsname}%
+  \filehook@parsefile{#1}%
+  \@ifundefined{\filehook@atend@\filehook@filename}%
+    {\long\global\@namedef{\filehook@atend@\filehook@filename}}%
+    {\expandafter\filehook@prefix\csname\filehook@atend@\filehook@filename\endcsname}%
 }
 %    \end{macrocode}
 % \end{macro}
