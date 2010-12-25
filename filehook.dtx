@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1935 2010-12-25 19:21:19Z martin $
+%% $Id: filehook.dtx 1936 2010-12-25 19:49:37Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{422}
+% \CheckSum{493}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -192,7 +192,7 @@
 % However, in the latter case |filehook| must be loaded using \Macro\RequirePackage beforehand.
 % The \Macro\AtBeginOfClassFile simply executes \Macro\AtBeginOfFile{<class name>.cls}{<\TeX code>}.
 % Special care is taken to ensure that the `AtEnd' code is executed \emph{after} any code installed by the class itself
-% using the \LaTeX\ macro \Macro\AtEndOfPackage. 
+% using the \LaTeX\ macro \Macro\AtEndOfClass.
 % If the starred version is used and the class is already loaded the code
 % is executed right away.
 %
@@ -630,13 +630,10 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\InputIfFileExists}
-% This macro is redefined for the general file hooks.
-% The original definition is checked but is not saved away and called by the new definition, because
-% of the existing complexity. The hooks must be places around the actual input macro (\Macro{@@input}).
-%
-% Alternatives definitions of \cs{InputIfFileExists} are defined here for comparison.
-% This is done inside a group to keep them only temporary.
+% The |filehook| default definition of \Macro{InputIfFileExists} is defined here
+% together with alternatives definitions for comparison.
+% There are stored in a macro which is expanded if required.
+% This is always done inside a group to keep them temporary only.
 %    \begin{macrocode}
 \def\filehook@alt@InputIfFileExists{%
 %
@@ -713,8 +710,7 @@
 % If the |scrlfile| package definition is detected the |filehook|s are added
 % to that definition. Unfortunately the \Macro{scr@load@hook}{before} hook is placed \emph{before}
 % not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
-% Note that should |scrlfile| ever change its \Macro{InputIfFileExists} macro this code will not be executed and
-% the general clause below will kick in.
+% Note that this will stop working if |scrlfile| ever changes its definition of the \Macro{InputIfFileExists} macro.
 %    \begin{macrocode}
 %
 \def\filehook@if@scrlfile#1{%
@@ -740,10 +736,8 @@
   \@ifclassloaded {memoir}{%
   \ifx\InputIfFileExists\memoir@InputIfFileExists
     \global\let\InputIfFileExists\filehook@InputIfFileExists
-    \AtEndOfPackage{%
-        \AtBeginOfFiles{\m@matbeginf{#1}}%
-        \AtEndOfFiles{\m@matendf{#1}\killm@matf{#1}}%
-    }
+    \AtBeginOfFiles{\m@matbeginf{#1}}%
+    \AtEndOfFiles{\m@matendf{#1}\killm@matf{#1}}%
     \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the 'At...OfFiles' hooks}
   \else
     \iffilehook@force
@@ -759,20 +753,15 @@
 }
 \@onlypreamble\filehook@if@memoir
 %    \end{macrocode}
-% Otherwise the normal |filehook| definition will be set. If |memoir| is detected its hooks
-% are added to the appropriate |At...OfFiles| hooks. This works fine because its hooks have the
-% exact same position.
-%    \end{macrocode}
-%    \begin{macrocode}
-
-%    \end{macrocode}
 %
-% Finally, if no specific alternate definition is detected the original \LaTeX\ definition is checked for and a
-% warning is given if any other unknown definition is detected. In this case it will be simply overwritten.
+% The default and alternative definitions of \Macro\InputIfFileExists are first expanded inside a group.
 %    \begin{macrocode}
 \begingroup
 \filehook@alt@InputIfFileExists
 %    \end{macrocode}
+% First we test for the |scrlfile| package. The test macro adds the necessary patches if so.
+% In order to also support it when it is loaded afterwards the two hooks below are used to revert the definition
+% before the package and patch it afterwards.
 %    \begin{macrocode}
 \filehook@if@scrlfile{}{%
   \AtBeginOfPackageFile{scrlfile}{%
@@ -785,6 +774,10 @@
     \filehook@if@scrlfile{}{}}%
   }%
 %    \end{macrocode}
+% If |memoir| is detected its hooks
+% are added to the appropriate |At...OfFiles| hooks. This works fine because its hooks have the
+% exact same position. Please note that the case when |memoir| is used together with |scrlfile| is not explicitly covered.
+% In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
   \filehook@if@memoir{}{%
     \ifx\documentclass\@twoclasseserror\else
@@ -799,6 +792,9 @@
       }%
     \fi
 %    \end{macrocode}
+% Finally, if no specific alternate definition is detected the original \LaTeX\ definition is checked for and a
+% error is given if any other unknown definition is detected.
+% The \opt{force} option will change the error into a warning and overwrite the macro with the default.
 %    \begin{macrocode}
     \ifx\InputIfFileExists\latex@InputIfFileExists
       \global\let\InputIfFileExists\filehook@InputIfFileExists
@@ -817,7 +813,6 @@
 %    \begin{macrocode}
 \endgroup
 %    \end{macrocode}
-% \end{macro}
 %
 % \iffalse
 %</package>
