@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1937 2010-12-25 20:27:48Z martin $
+%% $Id: filehook.dtx 1938 2010-12-26 19:39:42Z martin $
 % \fi
 %
 % \iffalse
@@ -259,6 +259,8 @@
 % Note: |#1| always includes the |.tex| extension.
 %    \begin{macrocode}
 \def\filehook@include@atbegin#1{%
+  \let\InputIfFileExists\filehook@@InputIfFileExists
+  \filehook@every@atbegin{#1}%
   \@nameuse{\filehook@include@atbegin@#1}%
 }
 \def\filehook@include@atend#1{%
@@ -266,6 +268,7 @@
 }
 \def\filehook@include@after#1{%
   \@nameuse{\filehook@include@after@#1}%
+  \filehook@every@atend{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -276,12 +279,15 @@
 % \begin{macro}{\filehook@input@atend}
 %    \begin{macrocode}
 \def\filehook@input@atbegin#1{%
+  \let\InputIfFileExists\filehook@@InputIfFileExists
   \filehook@parsefile{#1}%
+  \filehook@every@atbegin{#1}%
   \@nameuse{\filehook@input@atbegin@\filehook@filename}%
 }
 \def\filehook@input@atend#1{%
   \filehook@parsefile{#1}%
   \@nameuse{\filehook@input@atend@\filehook@filename}%
+  \filehook@every@atend{#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -297,6 +303,17 @@
 \def\filehook@atend#1{%
   \filehook@parsefile{#1}%
   \@nameuse{\filehook@atend@\filehook@filename}%
+}
+%    \end{macrocode}
+% \end{macro}
+% \end{macro}
+%
+% \begin{macro}{\filehook@every@atbegin}
+% \begin{macro}{\filehook@every@atend}
+%    \begin{macrocode}
+\def\filehook@every@atbegin#1{%
+}
+\def\filehook@every@atend#1{%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -494,6 +511,22 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\AtBeginOfEveryFile}
+%    \begin{macrocode}
+\newcommand*\AtBeginOfEveryFile{%
+  \filehook@appendwarg\filehook@every@atbegin
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\AtEndOfEveryFile}
+%    \begin{macrocode}
+\newcommand*\AtEndOfEveryFile{%
+  \filehook@prefixwarg\filehook@every@atend
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\AtBeginOfFile}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfFile[1]{%
@@ -663,7 +696,19 @@
     }%
 }
 %
-\long\gdef\filehook@InputIfFileExists##1##2{%
+\long\gdef\filehook@default@InputIfFileExists##1##2{%
+  \IfFileExists{##1}%
+    {##2\@addtofilelist{##1}%
+     \filehook@every@atbegin{##1}%
+     \filehook@atbegin{##1}%
+     \@@input\@filef@und
+     \filehook@atend{##1}%
+     \filehook@every@atend{##1}%
+    }%
+}
+%
+\long\gdef\filehook@@default@InputIfFileExists##1##2{%
+  \let\InputIfFileExists\filehook@InputIfFileExists
   \IfFileExists{##1}%
     {##2\@addtofilelist{##1}%
      \filehook@atbegin{##1}%
@@ -680,7 +725,7 @@
      \killm@matf{##1}}%
 }
 %
-\long\def\scrlfile@InputIfFileExists##1##2{%
+\long\def\scrlfile@@InputIfFileExists##1##2{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname ##1-@alias\endcsname\relax
     \expandafter\@secondoftwo
@@ -715,6 +760,31 @@
   {\IfFileExists{##1}{%
       \scr@load@hook{before}{##1}%
       ##2\@addtofilelist{##1}%
+      \filehook@every@atbegin{##1}%
+      \filehook@atbegin{##1}%
+      \@@input \@filef@und
+      \filehook@atend{##1}%
+      \filehook@every@atend{##1}%
+      \scr@load@hook{after}{##1}%
+    }}%
+}
+%
+\long\def\filehook@@scrlfile@InputIfFileExists##1##2{%
+  \let\InputIfFileExists\filehook@InputIfFileExists
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname ##1-@alias\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \scr@replacefile@msg{\csname ##1-@alias\endcsname}{##1}%
+    \expandafter\@firstoftwo
+  \fi
+  {%
+    \expandafter\InputIfFileExists\expandafter{\csname
+      ##1-@alias\endcsname}{##2}%
+  }%
+  {\IfFileExists{##1}{%
+      \scr@load@hook{before}{##1}%
+      ##2\@addtofilelist{##1}%
       \filehook@atbegin{##1}%
       \@@input \@filef@und
       \filehook@atend{##1}%
@@ -735,10 +805,14 @@
 \def\filehook@if@scrlfile#1{%
   \@ifpackageloaded {scrlfile}{%
   \ifx\InputIfFileExists\scrlfile@InputIfFileExists
-    \global\let\InputIfFileExists\filehook@scrlfile@InputIfFileExists
+    \global\let\filehook@InputIfFileExists\filehook@scrlfile@InputIfFileExists
+    \global\let\filehook@@InputIfFileExists\filehook@@scrlfile@InputIfFileExists
+    \global\let\InputIfFileExists\filehook@InputIfFileExists
     \PackageInfo{filehook}{Package 'scrlfile' detected and compensated for}%
   \else
     \iffilehook@force
+      \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+      \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
       \global\let\InputIfFileExists\filehook@InputIfFileExists
       \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.%
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
@@ -754,12 +828,16 @@
 \def\filehook@if@memoir#1{%
   \@ifclassloaded {memoir}{%
   \ifx\InputIfFileExists\memoir@InputIfFileExists
+    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
     \global\let\InputIfFileExists\filehook@InputIfFileExists
     \AtBeginOfFiles{\m@matbeginf{#1}}%
     \AtEndOfFiles{\m@matendf{#1}\killm@matf{#1}}%
     \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the 'At...OfFiles' hooks}
   \else
     \iffilehook@force
+      \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+      \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
       \global\let\InputIfFileExists\filehook@InputIfFileExists
       \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
@@ -816,9 +894,13 @@
 % The \opt{force} option will change the error into a warning and overwrite the macro with the default.
 %    \begin{macrocode}
     \ifx\InputIfFileExists\latex@InputIfFileExists
+      \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+      \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
       \global\let\InputIfFileExists\filehook@InputIfFileExists
     \else
       \iffilehook@force
+        \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+        \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
         \global\let\InputIfFileExists\filehook@InputIfFileExists
         \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.
                                   The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
