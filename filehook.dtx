@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1938 2010-12-26 19:39:42Z martin $
+%% $Id: filehook.dtx 1939 2010-12-27 19:48:33Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{530}
+% \CheckSum{651}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -674,11 +674,12 @@
 % This macro is redefined for the \Macro{input} file hooks.
 % it simply surrounds the original macro with the hooks.
 %    \begin{macrocode}
-\def\@iinput#1{%
+\def\filehook@@iinput#1{%
   \filehook@input@atbegin{#1}%
   \filehook@orig@@iinput{#1}%
   \filehook@input@atend{#1}%
 }
+\let\@iinput\filehook@@iinput
 %    \end{macrocode}
 % \end{macro}
 %
@@ -725,7 +726,7 @@
      \killm@matf{##1}}%
 }
 %
-\long\def\scrlfile@@InputIfFileExists##1##2{%
+\long\def\scrlfile@InputIfFileExists##1##2{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname ##1-@alias\endcsname\relax
     \expandafter\@secondoftwo
@@ -814,10 +815,10 @@
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
       \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
       \global\let\InputIfFileExists\filehook@InputIfFileExists
-      \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.%
+      \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
     \else
-      \PackageError{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.%
+      \PackageError{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
                               Use the 'force' option of 'filehook' to overwrite it.}%
     \fi
   \fi
@@ -838,11 +839,10 @@
     \iffilehook@force
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
       \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-      \global\let\InputIfFileExists\filehook@InputIfFileExists
-      \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.
+      \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
     \else
-      \PackageError{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.
+      \PackageError{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
                               Use the 'force' option of 'filehook' to overwrite it.}%
     \fi
   \fi
@@ -880,10 +880,13 @@
     \ifx\documentclass\@twoclasseserror\else
       \AtBeginOfClassFile{memoir}{%
         {\filehook@alt@InputIfFileExists
+         \global\let\filehook@@InputIfFileExists\latex@InputIfFileExists
          \global\let\InputIfFileExists\latex@InputIfFileExists
+         \global\let\@iinput\filehook@orig@@iinput
         }%
       }%
       \AtEndOfClassFile{memoir}{%
+        \global\let\@iinput\filehook@@iinput
         {\filehook@alt@InputIfFileExists
         \filehook@if@memoir{}{}}%
       }%
@@ -896,23 +899,28 @@
     \ifx\InputIfFileExists\latex@InputIfFileExists
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
       \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-      \global\let\InputIfFileExists\filehook@InputIfFileExists
     \else
       \iffilehook@force
         \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
         \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-        \global\let\InputIfFileExists\filehook@InputIfFileExists
-        \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.
+        \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
                                   The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
       \else
-        \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.
+        \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
                                 Use the 'force' option of 'filehook' to overwrite it.}%
       \fi
     \fi
 }}
+\endgroup
 %    \end{macrocode}
 %    \begin{macrocode}
-\endgroup
+\let\InputIfFileExists\filehook@InputIfFileExists
+\AtBeginDocument{%
+    \ifx\InputIfFileExists\filehook@InputIfFileExists\else
+        \PackageWarning{filehook}{Macro \string\InputIfFileExists\space got redefined after 'filehook' was loaded.^^J%
+                                  Certain file hooks might now be dysfunctional!}
+    \fi
+}
 %    \end{macrocode}
 %
 % \iffalse
