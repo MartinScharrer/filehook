@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1944 2010-12-28 14:25:24Z martin $
+%% $Id: filehook.dtx 1945 2010-12-28 14:43:08Z martin $
 % \fi
 %
 % \iffalse
@@ -130,36 +130,69 @@
 % If required inside another package a different order can be enforced by using the internal hook macros shown in the implementation section.
 %
 %
-% \subsection*{Include Files}
-% \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
-% \DescribeMacro{\AfterIncludes}{<\TeX\ code>}
-% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro{include}.
-% The code can use the macro argument |#1|
-% which will be expanded to the include \meta{file name}, i.e.\ the hooks are macros with one argument which will be the file name.
-% As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro{clearpage}.
-% Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd` hook, to ensure
-% that the old values are still valid for the last page.
+%^^A Some internal macros to draw the hook positions:
+% \def\Hook#1{\textsf{Hook: #1}\MacroArgs}
 %
-% \DescribeMacro{\AtBeginOfIncludeFile}{<file name>}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfIncludeFile}{<file name>}{<\TeX\ code>}
-% \DescribeMacro{\AfterIncludeFile}{<file name>}{<\TeX\ code>}
-% These file-specific macros take the two arguments. The \meta{code} is only executed for the file with the given \meta{file name}
-% and only if it is read using \Macro{include}. It is not allowed to use macro arguments inside the code.
-% The \meta{file name} should be identical to the name used for \Macro{include} and not include the `|.tex|' extension.
+% \def\DrawInputIfB#1{%
+% \hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\InputIfFileExists:}%
+%   \hbox{\fbox{\vbox{%
+%     \hbox{\Hook{AtBeginOfFile}{<file name>}}%
+%     #1%
+%     \hbox{\Hook{AtBeginOfFiles}}%
+%     \hbox{\fbox{\emph{Content}}}%
+%     \vspace{2pt}%
+%     \hbox{\Hook{AtEndOfFiles}}%
+%     \hbox{\Hook{AtEndOfFile}{<file name>}}%
+%   }}}%
+% }}%
+% }%
+% 
+% \def\DrawInputIf#1{%
+% \hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\InputIfFileExists:}%
+%   \hbox{\fbox{\vbox{%
+%     \hbox{\Hook{AtBeginOfEveryFile}}%
+%     \hbox{\Hook{AtBeginOfFile}{<file name>}}%
+%     #1%
+%     \hbox{\Hook{AtBeginOfFiles}}%
+%     \hbox{\fbox{\emph{Content}}}%
+%     \vspace{2pt}%
+%     \hbox{\Hook{AtEndOfFiles}}%
+%     \hbox{\Hook{AtEndOfFile}{<file name>}}%
+%     \hbox{\Hook{AtEndOfEveryFile}}%
+%   }}}%
+% }}%
+% }%
 %
 %
-% \subsection*{Input Files}
+% \subsection*{Every File}
 %
-% \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
-% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro{input}. Again, the macro argument |#1| can be used inside the \meta{code} and
-% will be expanded to the \meta{file name}.
+% \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
+% Sometime certain code should be executed at the begin and end of every read file, e.g.\ pushing and popping a file stack.
+% The \Macro{At...OfFiles} hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
+% The \Macro\AtEndOfFiles is executed before it, which can cause issues with page headers and footers.
+% A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
+% once in the |include| related hooks and once in the |OfFiles| hooks.
 %
-% \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
-% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
-% extension! The \meta{code} must not include any macro arguments (|#1|).
+% A better solution for this problem was added in v0.4 from 2010/12/28:
+% the |EveryFile| hooks will be executed exactly once for every file, independent if it is
+% read using \Macro\input, \Macro\include or \Macro\InputIfFileExists.
+% Special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
+%
+% These hooks are located around the more specific hooks:
+% For \Macro\input files the `Begin' hook is executed before the \Macro\AtBeginOfInputs hook and the `End' hook after
+% the \Macro\AtEndOfInputs.
+% Similarly, for \Macro\include files the `Begin' hook is executed before the \Macro\AtBeginOfIncludes hook and the `End' hook after
+% the \Macro\AfterIncludes (!).
+% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
+% \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks, respectively.
+% Note that the \Macro\AtBeginOfEveryFile hook is executed before the \Macro\AtBeginOfPackageFile/\Macro\AtBeginOfClassFile hooks
+% and that the \Macro\AtEndOfEveryFile hook is executed also before the \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile hooks.
+% The `Every' and `PackageFile/ClassFile' hooks therefore do not nest correctly like all other hooks do.
 %
 %
 % \subsection*{All Files}
@@ -178,31 +211,76 @@
 % The `all files' hooks are closer to the file content than the \Macro{input} and \Macro{include} hook, i.e.\ the \Macro{AtBeginOfFiles} comes \emph{after} the \Macro{AtBeginOfIncludes} and
 % the \Macro{AtEndOfFiles} comes \emph{before} the \Macro{AtEndOfIncludes} hook.
 %
-% \subsection*{Every File}
+% The following figure shows the positions of the hooks inside the macro:\par\medskip
+% \centerline{\DrawInputIf{}}
 %
-% \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
-% Sometime certain code should be executed at the begin and end of every read file, e.g.\ pushing and popping a file stack.
-% The \Macro{At...OfFiles} hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
-% The \Macro\AtEndOfFiles is executed before it, which can cause issues with page headers and footers.
-% A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
-% once in the |include| related hooks and once in the |OfFiles| hooks.
 %
-% A better solution for this problem was added in v0.4 from 2010/12/28:
-% the |EveryFile| hooks will be executed exactly once for every file, independent if it is
-% read using \Macro\input, \Macro\include or \Macro\InputIfFileExists.
-% Special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
+% \subsection*{Include Files}
+% \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
+% \DescribeMacro{\AfterIncludes}{<\TeX\ code>}
+% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro{include}.
+% The code can use the macro argument |#1|
+% which will be expanded to the include \meta{file name}, i.e.\ the hooks are macros with one argument which will be the file name.
+% As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro{clearpage}.
+% Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd` hook, to ensure
+% that the old values are still valid for the last page.
 %
-% These hooks are located around the more specific hooks listed above:
-% For \Macro\input files the `Begin' hook is executed before the \Macro\AtBeginOfInputs hook and the `End' hook after
-% the \Macro\AtEndOfInputs.
-% Similarly, for \Macro\include files the `Begin' hook is executed before the \Macro\AtBeginOfIncludes hook and the `End' hook after
-% the \Macro\AfterIncludes (!).
-% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
-% \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks, respectively.
-% Note that the \Macro\AtBeginOfEveryFile hook is executed before the \Macro\AtBeginOfPackageFile/\Macro\AtBeginOfClassFile hooks
-% and that the \Macro\AtEndOfEveryFile hook is executed also before the \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile hooks.
-% The `Every' and `PackageFile/ClassFile' hooks therefore do not nest correctly like all other hooks do.
+% \DescribeMacro{\AtBeginOfIncludeFile}{<file name>}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfIncludeFile}{<file name>}{<\TeX\ code>}
+% \DescribeMacro{\AfterIncludeFile}{<file name>}{<\TeX\ code>}
+% These file-specific macros take the two arguments. The \meta{code} is only executed for the file with the given \meta{file name}
+% and only if it is read using \Macro{include}. It is not allowed to use macro arguments inside the code.
+% The \meta{file name} should be identical to the name used for \Macro{include} and not include the `|.tex|' extension.
+%
+% The following figure shows the positions of the hooks inside the macro:\par\medskip
+% \centerline{\hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\include:}%
+%   \hbox{\fbox{\vbox{%
+%    \hbox{\Hook{AtBeginOfEveryFile}}%
+%    \hbox{\Hook{AtBeginOfIncludeFile}{<file name>}}%
+%    \hbox{\Hook{AtBeginOfIncludes}}%
+%    \hbox{\fbox{\DrawInputIfB{}}}%
+%    \vspace{2pt}%
+%    \hbox{\Hook{AtEndOfIncludes}}%
+%    \hbox{\Hook{AtEndOfIncludeFile}{<file name>}}%
+%    \hbox{\Macro\clearpage~~(implicit)}%
+%    \hbox{\Hook{AfterIncludes}}%
+%    \hbox{\Hook{AfterIncludeFile}{<file name>}}%
+%    \hbox{\Hook{AtEndOfEveryFile}}%
+%   }}}%
+% }}}
+%
+%
+% \subsection*{Input Files}
+%
+% \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
+% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro{input}. Again, the macro argument |#1| can be used inside the \meta{code} and
+% will be expanded to the \meta{file name}.
+%
+% \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
+% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
+% extension! The \meta{code} must not include any macro arguments (|#1|).
+%
+% The following figure shows the positions of the hooks inside the macro:\par\medskip
+% \centerline{\hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\input:}%
+%   \hbox{\fbox{\vbox{%
+%    \hbox{\Hook{AtBeginOfEveryFile}}%
+%    \hbox{\Hook{AtBeginOfInputFile}{<file name>}}%
+%    \hbox{\Hook{AtBeginOfInputs}}%
+%    \hbox{\fbox{\DrawInputIfB{}}}%
+%    \vspace{2pt}%
+%    \hbox{\Hook{AtEndOfInputs}}%
+%    \hbox{\Hook{AtEndOfInputFile}{<file name>}}%
+%    \hbox{\Hook{AtEndOfEveryFile}}%
+%   }}}%
+% }}}
+%
 %
 %
 % \subsection*{Package Files}
@@ -216,6 +294,17 @@
 % If the starred version is used and the package is already loaded the code
 % is executed right away.
 %
+% The following figure shows the positions of the hooks inside the macros:\par\medskip
+% \centerline{\hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\usepackage/\Macro\RequirePackage/\Macro\RequirePackageWithOptions:}%
+%   \hbox{\fbox{\vbox{%
+%    \hbox{\fbox{\DrawInputIf{\hbox{ (includes AtBeginOfPackageFile\MacroArgs{<file name>})}}}}%
+%    \vspace{2pt}%
+%    \hbox{\Hook{AtEndOfPackage}~~(\LaTeX\ hook)}%
+%    \hbox{\Hook{AtEndOfPackageFile}{<file name>}}%
+%   }}}%
+% }}}
 %
 % \subsection*{Class Files}
 %
@@ -229,6 +318,18 @@
 % using the \LaTeX\ macro \Macro\AtEndOfClass.
 % If the starred version is used and the class is already loaded the code
 % is executed right away.
+%
+% The following figure shows the positions of the hooks inside the macros:\par\medskip
+% \centerline{\hbox{\vbox{%
+%   \sffamily
+%   \hbox{\Macro\documentclass/\Macro\LoadClass/\Macro\LoadClassWithOptions:}%
+%   \hbox{\fbox{\vbox{%
+%    \hbox{\fbox{\DrawInputIf{\hbox{ (includes AtBeginOfClassFile\MacroArgs{<file name>})}}}}%
+%    \vspace{2pt}%
+%    \hbox{\Hook{AtEndOfClass}~~(\LaTeX\ hook)}%
+%    \hbox{\Hook{AtEndOfClassFile}{<file name>}}%
+%   }}}%
+% }}}
 %
 %
 %
