@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1939 2010-12-27 19:48:33Z martin $
+%% $Id: filehook.dtx 1940 2010-12-28 00:42:22Z martin $
 % \fi
 %
 % \iffalse
@@ -839,6 +839,7 @@
     \iffilehook@force
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
       \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+      \global\let\InputIfFileExists\filehook@InputIfFileExists
       \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
     \else
@@ -899,10 +900,12 @@
     \ifx\InputIfFileExists\latex@InputIfFileExists
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
       \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+      \global\let\InputIfFileExists\filehook@InputIfFileExists
     \else
       \iffilehook@force
         \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
         \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+        \global\let\InputIfFileExists\filehook@InputIfFileExists
         \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
                                   The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
       \else
@@ -914,7 +917,6 @@
 \endgroup
 %    \end{macrocode}
 %    \begin{macrocode}
-\let\InputIfFileExists\filehook@InputIfFileExists
 \AtBeginDocument{%
     \ifx\InputIfFileExists\filehook@InputIfFileExists\else
         \PackageWarning{filehook}{Macro \string\InputIfFileExists\space got redefined after 'filehook' was loaded.^^J%
