@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1943 2010-12-28 14:22:06Z martin $
+%% $Id: filehook.dtx 1944 2010-12-28 14:25:24Z martin $
 % \fi
 %
 % \iffalse
@@ -103,11 +103,13 @@
 % execute code at begin or the end of specific or all input files.
 % \end{abstract}
 %
+%
 % \section{Introduction}
 % These package changes some internal \LaTeX{} macros used to load input files so that they include `hooks'.
 % A hook is an (internal) macro executed at specific points. Normally it is initially empty, but can be extended using
 % an user level macro. The most common hook in \LaTeX{} is the `At-Begin-Document' hook. Code can be added to this hook
 % using \Macro{AtBeginDocument}{<\TeX code>}.
+%
 %
 % \section{Usage}
 % This package provides several groups of hooks: for file read using \Macro{input}, for files read using \Macro{include} and for all read files (i.e.\ all files read using
@@ -127,6 +129,7 @@
 % Therefore it is safely possible to surround the content of a file with multiple \LaTeX{} environments using multiple `AtBegin'/`AtEnd' macro calls.
 % If required inside another package a different order can be enforced by using the internal hook macros shown in the implementation section.
 %
+%
 % \subsection*{Include Files}
 % \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
@@ -145,6 +148,7 @@
 % and only if it is read using \Macro{include}. It is not allowed to use macro arguments inside the code.
 % The \meta{file name} should be identical to the name used for \Macro{include} and not include the `|.tex|' extension.
 %
+%
 % \subsection*{Input Files}
 %
 % \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
@@ -156,6 +160,7 @@
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
 % Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
+%
 %
 % \subsection*{All Files}
 %
@@ -226,7 +231,6 @@
 % is executed right away.
 %
 %
-% \StopEventually{}
 %
 % \section{Compatibility Issues with other Packages}
 % The |filehook| package might clash with other packages or classes which also redefine \Macro{InputIfFileExists}.
@@ -236,12 +240,14 @@
 % Then any previous modifications will be lost, which will most likely break the other package.
 % Please do not hesitate to inform the author of |filehook| of any encountered problems with other packages.
 %
+%
 % \subsection*{jmlrbook}
 % The |jmlrbook| class from the |jmlr| bundle temporary redefines \Macro{InputIfFileExists} to import papers.
 % The `original' definition is saved away at load time of the package and is used internally by the new definition.
 % This means that the hooks will not be active for this imported files because |filehook| is loaded after the class.
 % This should not affect its normal usage.
 % Note that, in theory, the package could be loaded before \Macro{documentclass} using \Macro{RequirePackage} to enable the file hooks also for these files.
+%
 %
 % \subsection*{memoir}
 % The |memoir| class redefines \Macro{InputIfFileExists} to add own hooks identical to the |At...OfFiles| hooks (there called \Macro{AtBeginFile} and \Macro{AtEndFile}).
@@ -252,15 +258,18 @@
 % Note that the `At...OfClassFile' hooks still work for the |memoir| class file itself. In fact they are used to restore the default definition of \Macro\InputIfFileExists
 % at the begin and patch it at the end of the class file.
 %
+%
 % \subsection*{scrlfile}
 % The |scrlfile| package from the \emph{koma-script} bundle redefines \Macro{InputIfFileExists} to allow file name aliases and to also add hooks.
 % If required it should be loaded before |filehook|, which will add its hooks correctly to the modified definition.
 % Since v0.4 from 2010/12/28 this modification will be also applied when the |scrlfile| package is loaded after |filehook|.
 %
+%
 % \subsection*{fink}
 % The |filehook| and |currfile| packages where written as replacements for the |fink| package, where |filehook| provides the necessary hooks for |currfile|.
 % The |fink| package has now been deprecated in favour of |currfile| and should not be used anymore. The |fink| compatibility code has been removed from |filehook|
 % and both cannot be used successfully together as both redefine the \Macro{InputIfFileExists} macro.
+%
 %
 % \subsection*{listings}
 % The \pkg{listings} package uses \Macro{input} inside \Macro{lstinputlisting}. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
@@ -269,7 +278,9 @@
 % as part of the listing. A known package suffering from this is \pkg{svn-multi} which loads |.svx| files for every |.tex| file.
 % A workaround for this issue is to temporally redefine \Macro{input} to \Macro{@input} for \Macro{lstinputlisting}: |{\let\input\@input\lstinputlisting{...}}|.
 %
-% 
+%
+%
+% \StopEventually{}
 % \section{Implementation}\label{sec:impl}
 %
 % \iffalse
@@ -355,8 +366,10 @@
 % \end{macro}
 %
 %
+%
 % \subsection{Hook Modification Macros}
 % The following macros are used to modify the hooks, i.e.\ to prefix or append code to them.
+%
 %
 % \subsubsection*{Internal Macros}
 %
