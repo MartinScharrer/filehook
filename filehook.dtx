@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1940 2010-12-28 00:42:22Z martin $
+%% $Id: filehook.dtx 1941 2010-12-28 12:02:38Z martin $
 % \fi
 %
 % \iffalse
@@ -29,7 +29,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2010/12/20 v0.3 Hooks for input files]
+    [2010/12/28 v0.4 Hooks for input files]
 %</package>
 %
 %<*driver>
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{651}
+% \CheckSum{679}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -72,6 +72,7 @@
 % \changes{v0.1}{2010/04/08}{Initial version}
 % \changes{v0.2}{2010/12/08}{Added support for 'memoir' class and 'scrlfile' package. Remove support for deprecated 'fink' package.}
 % \changes{v0.3}{2010/12/20}{Added hooks for package and class files. Changed a warning to an error and added the 'force' option to overwrite this.}
+% \changes{v0.4}{2010/12/28}{Improved support for 'memoir' class and 'scrlfile' package. Added AtBeginOfEveryFile and AtEndOfEveryFile hooks.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -170,6 +171,23 @@
 % The `all files' hooks are closer to the file content than the \Macro{input} and \Macro{include} hook, i.e.\ the \Macro{AtBeginOfFiles} comes \emph{after} the \Macro{AtBeginOfIncludes} and
 % the \Macro{AtEndOfFiles} comes \emph{before} the \Macro{AtEndOfIncludes} hook.
 %
+% \subsection*{Every File}
+%
+% \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
+% These macros (new in v0.4 from 2010/12/28) add code to two special hooks which will be executed exactly once for every file, independent if it is
+% read using \Macro\input, \Macro\include or \Macro\InputIfFileExists.
+% The difference to the \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks is that these are also executed for \Macro\input and \Macro\include files.
+% The `|EveryFile|' hooks however are executed only once, which makes them important for other packages which add per-file functionality like file stacks (e.g.\ \pkg{currfile}, \pkg{svn-multi}).
+%
+% These hooks are located around the more specific hooks listed above:
+% For \Macro\input files the `Begin' hook is executed before the \Macro\AtBeginOfInputs hook and the `End' hook after
+% the \Macro\AtEndOfInputs.
+% Similarly, for \Macro\include files the `Begin' hook is executed before the \Macro\AtBeginOfIncludes hook and the `End' hook after
+% the \Macro\AfterIncludes (!).
+% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles, respectively.
+% However, special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include, so that these hooks are only executed
+% once per \Macro\input or \Macro\include file!
 %
 % \subsection*{Package Files}
 %
@@ -217,10 +235,16 @@
 % \subsection*{memoir}
 % The |memoir| class redefines \Macro{InputIfFileExists} to add own hooks identical to the |At...OfFiles| hooks (there called \Macro{AtBeginFile} and \Macro{AtEndFile}).
 % This hooks will be moved to the corresponding ones of |filehook| and will keep working as normal.
+% Since v0.4 from 2010/12/28 this modification will be also applied when the |filehook| package is loaded (using \Macro\RequirePackage) \emph{before} the
+% |memoir| class. However, the hooks from |filehook| need to be temporally disabled while reading the |memoir| class.
+% They will not be triggered for all files read directly by this class, like configuration and patch files.
+% Note that the `At...OfClassFile' hooks still work for the |memoir| class file itself. In fact they are used to restore the default definition of \Macro\InputIfFileExists
+% at the begin and patch it at the end of the class file.
 %
 % \subsection*{scrlfile}
 % The |scrlfile| package from the \emph{koma-script} bundle redefines \Macro{InputIfFileExists} to allow file name aliases and to also add hooks.
 % If required it should be loaded before |filehook|, which will add its hooks correctly to the modified definition.
+% Since v0.4 from 2010/12/28 this modification will be also applied when the |scrlfile| package is loaded after |filehook|.
 %
 % \subsection*{fink}
 % The |filehook| and |currfile| packages where written as replacements for the |fink| package, where |filehook| provides the necessary hooks for |currfile|.
