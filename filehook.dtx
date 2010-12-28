@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1942 2010-12-28 12:03:55Z martin $
+%% $Id: filehook.dtx 1943 2010-12-28 14:22:06Z martin $
 % \fi
 %
 % \iffalse
@@ -111,7 +111,9 @@
 %
 % \section{Usage}
 % This package provides several groups of hooks: for file read using \Macro{input}, for files read using \Macro{include} and for all read files (i.e.\ all files read using
-% \Macro{InputIfFileExists}, which includes package and class files and files falling into the first two groups). Since v0.3 from 2010/12/20 there are also hooks for package and class files.
+% \Macro{InputIfFileExists}, which includes package and class files, but also \Macro\input and \Macro\include files).
+% Since v0.3 from 2010/12/20 there are also hooks for package and class files.
+% Since v0.4 from 2010/12/28 there are also special hooks which can be used to executed code for every file.
 % All groups include a `AtBegin' and a `AtEnd' macro. The \Macro{include} group has also a `After' hook which
 % it is executed \emph{after} the page break (\Macro{clearpage}) is inserted by the \Macro{include} code. In contrast, the `AtEnd' hook is executed before the trailing page break 
 % and the `AtBegin' hook is executed after the \emph{leading} page break.
@@ -175,19 +177,28 @@
 %
 % \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
-% These macros (new in v0.4 from 2010/12/28) add code to two special hooks which will be executed exactly once for every file, independent if it is
+% Sometime certain code should be executed at the begin and end of every read file, e.g.\ pushing and popping a file stack.
+% The \Macro{At...OfFiles} hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
+% The \Macro\AtEndOfFiles is executed before it, which can cause issues with page headers and footers.
+% A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
+% once in the |include| related hooks and once in the |OfFiles| hooks.
+%
+% A better solution for this problem was added in v0.4 from 2010/12/28:
+% the |EveryFile| hooks will be executed exactly once for every file, independent if it is
 % read using \Macro\input, \Macro\include or \Macro\InputIfFileExists.
-% The difference to the \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks is that these are also executed for \Macro\input and \Macro\include files.
-% The `|EveryFile|' hooks however are executed only once, which makes them important for other packages which add per-file functionality like file stacks (e.g.\ \pkg{currfile}, \pkg{svn-multi}).
+% Special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
 %
 % These hooks are located around the more specific hooks listed above:
 % For \Macro\input files the `Begin' hook is executed before the \Macro\AtBeginOfInputs hook and the `End' hook after
 % the \Macro\AtEndOfInputs.
 % Similarly, for \Macro\include files the `Begin' hook is executed before the \Macro\AtBeginOfIncludes hook and the `End' hook after
 % the \Macro\AfterIncludes (!).
-% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles, respectively.
-% However, special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include, so that these hooks are only executed
-% once per \Macro\input or \Macro\include file!
+% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
+% \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks, respectively.
+% Note that the \Macro\AtBeginOfEveryFile hook is executed before the \Macro\AtBeginOfPackageFile/\Macro\AtBeginOfClassFile hooks
+% and that the \Macro\AtEndOfEveryFile hook is executed also before the \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile hooks.
+% The `Every' and `PackageFile/ClassFile' hooks therefore do not nest correctly like all other hooks do.
+%
 %
 % \subsection*{Package Files}
 %
