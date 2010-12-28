@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1945 2010-12-28 14:43:08Z martin $
+%% $Id: filehook.dtx 1946 2010-12-28 14:56:06Z martin $
 % \fi
 %
 % \iffalse
@@ -191,8 +191,8 @@
 % For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
 % \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks, respectively.
 % Note that the \Macro\AtBeginOfEveryFile hook is executed before the \Macro\AtBeginOfPackageFile/\Macro\AtBeginOfClassFile hooks
-% and that the \Macro\AtEndOfEveryFile hook is executed also before the \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile hooks.
-% The `Every' and `PackageFile/ClassFile' hooks therefore do not nest correctly like all other hooks do.
+% and that the \Macro\AtEndOfEveryFile hook is executed also before the hooks \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile.
+% Therefore the `Every' and `PackageFile'/`ClassFile' hooks do not nest correctly like all other hooks do.
 %
 %
 % \subsection*{All Files}
@@ -313,7 +313,7 @@
 % This macros install the given \MacroArgs<\TeX\ code> in the `AtBegin' and `AtEnd' hooks of the given class file.
 % They work with classes loaded using \Macro\LoadClass, \Macro\LoadClassWithOptions and also \Macro\documentclass.
 % However, in the latter case |filehook| must be loaded using \Macro\RequirePackage beforehand.
-% The \Macro\AtBeginOfClassFile simply executes \Macro\AtBeginOfFile{<class name>.cls}{<\TeX code>}.
+% The macro \Macro\AtBeginOfClassFile simply executes \Macro\AtBeginOfFile{<class name>.cls}{\ldots}.
 % Special care is taken to ensure that the `AtEnd' code is executed \emph{after} any code installed by the class itself
 % using the \LaTeX\ macro \Macro\AtEndOfClass.
 % If the starred version is used and the class is already loaded the code
@@ -377,7 +377,8 @@
 % Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
 % environment), any further code read using any input macro (\Macro{input}, \Macro{@input}, \Macro{@@input} (\TeX's \Macro{input}), \ldots) will be processed verbatim and typeset
 % as part of the listing. A known package suffering from this is \pkg{svn-multi} which loads |.svx| files for every |.tex| file.
-% A workaround for this issue is to temporally redefine \Macro{input} to \Macro{@input} for \Macro{lstinputlisting}: |{\let\input\@input\lstinputlisting{...}}|.
+% A workaround for this issue is to temporally redefine \Macro{input} to \Macro{@input} for \Macro{lstinputlisting}:\\
+% |   {\let\input\@input\lstinputlisting{...}}|.
 %
 %
 %
