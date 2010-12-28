@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1946 2010-12-28 14:56:06Z martin $
+%% $Id: filehook.dtx 1948 2010-12-28 23:55:05Z martin $
 % \fi
 %
 % \iffalse
@@ -406,17 +406,17 @@
 % \begin{macro}{\filehook@include@after}
 % Note: |#1| always includes the |.tex| extension.
 %    \begin{macrocode}
-\def\filehook@include@atbegin#1{%
+\def\filehook@include@atbegin{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
-  \filehook@every@atbegin{#1}%
-  \@nameuse{\filehook@include@atbegin@#1}%
+  \filehook@every@atbegin
+  \@nameuse{\filehook@include@atbegin@\filenamefilearg}%
 }
-\def\filehook@include@atend#1{%
-  \@nameuse{\filehook@include@atend@#1}%
+\def\filehook@include@atend{%
+  \@nameuse{\filehook@include@atend@\filenamefilearg}%
 }
-\def\filehook@include@after#1{%
-  \@nameuse{\filehook@include@after@#1}%
-  \filehook@every@atend{#1}%
+\def\filehook@include@after{%
+  \@nameuse{\filehook@include@after@\filenamefilearg}%
+  \filehook@every@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -426,16 +426,16 @@
 % \begin{macro}{\filehook@input@atbegin}
 % \begin{macro}{\filehook@input@atend}
 %    \begin{macrocode}
-\def\filehook@input@atbegin#1{%
+\def\filehook@input@atbegin{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
-  \filehook@parsefile{#1}%
-  \filehook@every@atbegin{#1}%
-  \@nameuse{\filehook@input@atbegin@\filehook@filename}%
+  \filehook@every@atbegin
+  \@nameuse{\filehook@input@atbegin@\filehookfilename}%
+  % New stuff is added here
 }
-\def\filehook@input@atend#1{%
-  \filehook@parsefile{#1}%
-  \@nameuse{\filehook@input@atend@\filehook@filename}%
-  \filehook@every@atend{#1}%
+\def\filehook@input@atend{%
+  % New stuff is added here
+  \@nameuse{\filehook@input@atend@\filehookfilename}%
+  \filehook@every@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -444,13 +444,13 @@
 % \begin{macro}{\filehook@atbegin}
 % \begin{macro}{\filehook@atend}
 %    \begin{macrocode}
-\def\filehook@atbegin#1{%
-  \filehook@parsefile{#1}%
-  \@nameuse{\filehook@atbegin@\filehook@filename}%
+\def\filehook@atbegin{%
+  \@nameuse{\filehook@atbegin@\filehookfilename}%
+  % New stuff is added here
 }
-\def\filehook@atend#1{%
-  \filehook@parsefile{#1}%
-  \@nameuse{\filehook@atend@\filehook@filename}%
+\def\filehook@atend{%
+  % New stuff is added here
+  \@nameuse{\filehook@atend@\filehookfilename}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -459,9 +459,9 @@
 % \begin{macro}{\filehook@every@atbegin}
 % \begin{macro}{\filehook@every@atend}
 %    \begin{macrocode}
-\def\filehook@every@atbegin#1{%
+\def\filehook@every@atbegin{%
 }
-\def\filehook@every@atend#1{%
+\def\filehook@every@atend{%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -497,21 +497,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\filehook@appendwarg}
-% Appends code with one macro argument. The \Macro{@tempa} intermediate step is required because of the
-% included |##1| which wouldn't correctly expand otherwise.
-%    \begin{macrocode}
-\long\def\filehook@appendwarg#1#2{%
-  \begingroup
-    \toks@\expandafter{#1{##1}#2}%
-    \edef\@tempa{\the\toks@}%
-    \expandafter\gdef\expandafter#1\expandafter##\expandafter1\expandafter{\@tempa}%
-  \endgroup
-}
-%    \end{macrocode}
-% \end{macro}
-%
-%
 % \begin{macro}{\filehook@prefix}
 % Prefixes code without an argument to a hook.
 %    \begin{macrocode}
@@ -525,26 +510,14 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\filehook@prefixwarg}
-% Prefixes code with an argument to a hook.
-%    \begin{macrocode}
-\long\def\filehook@prefixwarg#1#2{%
-  \begingroup
-    \@temptokena{#2}%
-    \toks@\expandafter{#1{##1}}%
-    \edef\@tempa{\the\@temptokena\the\toks@}%
-    \expandafter\gdef\expandafter#1\expandafter##\expandafter1\expandafter{\@tempa}%
-  \endgroup
-}
-%    \end{macrocode}
-% \end{macro}
 %
 % \begin{macro}{\filehook@parsefile}
 % Parses filename using the \LaTeX\ macro and defines it with an extension added if required.
 %    \begin{macrocode}
 \def\filehook@parsefile#1{%
+  \edef\filehookfilearg{#1}%
   \filename@parse{#1}%
-  \edef\filehook@filename{\filename@area\filename@base.\ifx\filename@ext\relax tex\else\filename@ext\fi}%
+  \edef\filehookfilename{\filename@area\filename@base.\ifx\filename@ext\relax tex\else\filename@ext\fi}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -556,7 +529,7 @@
 % \begin{macro}{\AtBeginOfIncludes}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfIncludes{%
-  \filehook@appendwarg\filehook@include@atbegin
+  \filehook@append\filehook@include@atbegin
 }
 %    \end{macrocode}
 % \end{macro}
@@ -564,7 +537,7 @@
 % \begin{macro}{\AtEndOfIncludes}
 %    \begin{macrocode}
 \newcommand*\AtEndOfIncludes{%
-  \filehook@prefixwarg\filehook@include@atend
+  \filehook@prefix\filehook@include@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -572,7 +545,7 @@
 % \begin{macro}{\AfterIncludes}
 %    \begin{macrocode}
 \newcommand*\AfterIncludes{%
-  \filehook@prefixwarg\filehook@include@after
+  \filehook@prefix\filehook@include@after
 }
 %    \end{macrocode}
 % \end{macro}
@@ -581,8 +554,9 @@
 %    \begin{macrocode}
 \newcommand*\AtBeginOfIncludeFile[1]{%
   \@ifundefined{\filehook@include@atbegin@#1.tex}%
-    {\long\global\@namedef{\filehook@include@atbegin@#1.tex}}%
-    {\expandafter\filehook@append\csname\filehook@include@atbegin@#1.tex\endcsname}%
+    {\global\@namedef{\filehook@include@atbegin@#1.tex}{}}%
+    {}%
+  \expandafter\filehook@append\csname\filehook@include@atbegin@#1.tex\endcsname%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -591,8 +565,9 @@
 %    \begin{macrocode}
 \newcommand*\AtEndOfIncludeFile[1]{%
   \@ifundefined{\filehook@include@atend@#1.tex}%
-    {\long\global\@namedef{\filehook@include@atend@#1.tex}}%
-    {\expandafter\filehook@prefix\csname\filehook@include@atend@#1.tex\endcsname}%
+    {\global\@namedef{\filehook@include@atend@#1.tex}{}}%
+    {}%
+  \expandafter\filehook@prefix\csname\filehook@include@atend@#1.tex\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -601,8 +576,9 @@
 %    \begin{macrocode}
 \newcommand*\AfterIncludeFile[1]{%
   \@ifundefined{\filehook@include@after@#1.tex}%
-    {\long\global\@namedef{\filehook@include@after@#1.tex}}%
-    {\expandafter\filehook@prefix\csname\filehook@include@after@#1.tex\endcsname}%
+    {\long\global\@namedef{\filehook@include@after@#1.tex}{}}%
+    {}%
+  \expandafter\filehook@prefix\csname\filehook@include@after@#1.tex\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -610,7 +586,7 @@
 % \begin{macro}{\AtBeginOfInputs}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfInputs{%
-  \filehook@appendwarg\filehook@input@atbegin
+  \filehook@append\filehook@input@atbegin
 }
 %    \end{macrocode}
 % \end{macro}
@@ -618,7 +594,7 @@
 % \begin{macro}{\AtEndOfInputs}
 %    \begin{macrocode}
 \newcommand*\AtEndOfInputs{%
-  \filehook@prefixwarg\filehook@input@atend
+  \filehook@prefix\filehook@input@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -627,9 +603,10 @@
 %    \begin{macrocode}
 \newcommand*\AtBeginOfInputFile[1]{%
   \filehook@parsefile{#1}%
-  \@ifundefined{\filehook@input@atbegin@\filehook@filename}%
-    {\long\global\@namedef{\filehook@input@atbegin@\filehook@filename}}%
-    {\expandafter\filehook@append\csname\filehook@input@atbegin@\filehook@filename\endcsname}%
+  \@ifundefined{\filehook@input@atbegin@\filehookfilename}%
+    {\global\@namedef{\filehook@input@atbegin@\filehookfilename}{}}%
+    {}%
+  \expandafter\filehook@append\csname\filehook@input@atbegin@\filehookfilename\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -638,9 +615,10 @@
 %    \begin{macrocode}
 \newcommand*\AtEndOfInputFile[1]{%
   \filehook@parsefile{#1}%
-  \@ifundefined{\filehook@input@atend@\filehook@filename}%
-    {\long\global\@namedef{\filehook@input@atend@\filehook@filename}}%
-    {\expandafter\filehook@prefix\csname\filehook@input@atend@\filehook@filename\endcsname}%
+  \@ifundefined{\filehook@input@atend@\filehookfilename}%
+    {\global\@namedef{\filehook@input@atend@\filehookfilename}{}}%
+    {}%
+  \expandafter\filehook@prefix\csname\filehook@input@atend@\filehookfilename\endcsname%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -648,7 +626,7 @@
 % \begin{macro}{\AtBeginOfFiles}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfFiles{%
-  \filehook@appendwarg\filehook@atbegin
+  \filehook@append\filehook@atbegin
 }
 %    \end{macrocode}
 % \end{macro}
@@ -656,7 +634,7 @@
 % \begin{macro}{\AtEndOfFiles}
 %    \begin{macrocode}
 \newcommand*\AtEndOfFiles{%
-  \filehook@prefixwarg\filehook@atend
+  \filehook@prefix\filehook@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -664,7 +642,7 @@
 % \begin{macro}{\AtBeginOfEveryFile}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfEveryFile{%
-  \filehook@appendwarg\filehook@every@atbegin
+  \filehook@append\filehook@every@atbegin
 }
 %    \end{macrocode}
 % \end{macro}
@@ -672,7 +650,7 @@
 % \begin{macro}{\AtEndOfEveryFile}
 %    \begin{macrocode}
 \newcommand*\AtEndOfEveryFile{%
-  \filehook@prefixwarg\filehook@every@atend
+  \filehook@prefix\filehook@every@atend
 }
 %    \end{macrocode}
 % \end{macro}
@@ -681,9 +659,10 @@
 %    \begin{macrocode}
 \newcommand*\AtBeginOfFile[1]{%
   \filehook@parsefile{#1}%
-  \@ifundefined{\filehook@atbegin@\filehook@filename}%
-    {\long\global\@namedef{\filehook@atbegin@\filehook@filename}}%
-    {\expandafter\filehook@append\csname\filehook@atbegin@\filehook@filename\endcsname}%
+  \@ifundefined{\filehook@atbegin@\filehookfilename}%
+    {\global\@namedef{\filehook@atbegin@\filehookfilename}{}}%
+    {}%
+  \expandafter\filehook@append\csname\filehook@atbegin@\filehookfilename\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -692,9 +671,10 @@
 %    \begin{macrocode}
 \newcommand*\AtEndOfFile[1]{%
   \filehook@parsefile{#1}%
-  \@ifundefined{\filehook@atend@\filehook@filename}%
-    {\long\global\@namedef{\filehook@atend@\filehook@filename}}%
-    {\expandafter\filehook@prefix\csname\filehook@atend@\filehook@filename\endcsname}%
+  \@ifundefined{\filehook@atend@\filehookfilename}%
+    {\global\@namedef{\filehook@atend@\filehookfilename}{}}%
+    {}%
+  \expandafter\filehook@prefix\csname\filehook@atend@\filehookfilename\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -808,11 +788,14 @@
 %    \begin{macrocode}
 \def\@input@#1{%
   \@ifnextchar\clearpage
-    {\filehook@include@atbegin{#1}%
+    {%
+     \filehook@parsefile{#1}%
+     \filehook@include@atbegin
      \filehook@orig@@input@{#1}%
-     \filehook@include@atend{#1}%
+     \filehook@parsefile{#1}%
+     \filehook@include@atend
      \clearpage
-     \filehook@include@after{#1}%
+     \filehook@include@after
      \@gobble
     }%
     {\filehook@orig@@input@{#1}}%
@@ -825,9 +808,11 @@
 % it simply surrounds the original macro with the hooks.
 %    \begin{macrocode}
 \def\filehook@@iinput#1{%
-  \filehook@input@atbegin{#1}%
+  \filehook@parsefile{#1}%
+  \filehook@input@atbegin
   \filehook@orig@@iinput{#1}%
-  \filehook@input@atend{#1}%
+  \filehook@parsefile{#1}%
+  \filehook@input@atend
 }
 \let\@iinput\filehook@@iinput
 %    \end{macrocode}
@@ -851,10 +836,12 @@
   \IfFileExists{##1}%
     {##2\@addtofilelist{##1}%
      \filehook@every@atbegin{##1}%
-     \filehook@atbegin{##1}%
+     \filehook@parsefile{##1}%
+     \filehook@atbegin
      \@@input\@filef@und
-     \filehook@atend{##1}%
-     \filehook@every@atend{##1}%
+     \filehook@parsefile{##1}%
+     \filehook@atend
+     \filehook@every@atend
     }%
 }
 %
@@ -862,9 +849,10 @@
   \let\InputIfFileExists\filehook@InputIfFileExists
   \IfFileExists{##1}%
     {##2\@addtofilelist{##1}%
-     \filehook@atbegin{##1}%
+     \filehook@parsefile{##1}%
+     \filehook@atbegin
      \@@input\@filef@und
-     \filehook@atend{##1}%
+     \filehook@atend
     }%
 }
 %
@@ -911,11 +899,13 @@
   {\IfFileExists{##1}{%
       \scr@load@hook{before}{##1}%
       ##2\@addtofilelist{##1}%
-      \filehook@every@atbegin{##1}%
-      \filehook@atbegin{##1}%
+      \filehook@parsefile{##1}%
+      \filehook@every@atbegin
+      \filehook@atbegin
       \@@input \@filef@und
-      \filehook@atend{##1}%
-      \filehook@every@atend{##1}%
+      \filehook@parsefile{##1}%
+      \filehook@atend
+      \filehook@every@atend
       \scr@load@hook{after}{##1}%
     }}%
 }
@@ -936,9 +926,11 @@
   {\IfFileExists{##1}{%
       \scr@load@hook{before}{##1}%
       ##2\@addtofilelist{##1}%
-      \filehook@atbegin{##1}%
+      \filehook@parsefile{##1}%
+      \filehook@atbegin
       \@@input \@filef@und
-      \filehook@atend{##1}%
+      \filehook@parsefile{##1}%
+      \filehook@atend
       \scr@load@hook{after}{##1}%
     }}%
 }
@@ -982,8 +974,9 @@
     \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
     \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
     \global\let\InputIfFileExists\filehook@InputIfFileExists
-    \AtBeginOfFiles{\m@matbeginf{#1}}%
-    \AtEndOfFiles{\m@matendf{#1}\killm@matf{#1}}%
+    \AtBeginOfFiles{\expandafter\m@matbeginf\expandafter{\filehookfilearg}}%
+    \AtEndOfFiles{\expandafter\m@matendf\expandafter{\filehookfilearg}%
+                  \expandafter\killm@matf\expandafter{\filehookfilearg}}%
     \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the 'At...OfFiles' hooks}
   \else
     \iffilehook@force
