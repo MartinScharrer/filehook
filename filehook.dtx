@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1949 2010-12-29 13:02:53Z martin $
+%% $Id: filehook.dtx 1950 2010-12-29 15:43:08Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{655}
+% \CheckSum{660}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -414,29 +414,33 @@
 % The general hooks are initialised to call the file specific hooks.
 %
 % \begin{macro}{\filehook@include@atbegin}
-% \begin{macro}{\filehook@include@atend}
-% \begin{macro}{\filehook@include@after}
-% Note: |#1| always includes the |.tex| extension.
 %    \begin{macrocode}
 \def\filehook@include@atbegin{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
   \filehook@every@atbegin
   \@nameuse{\filehook@include@atbegin@\filenamefilearg}%
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@include@atend}
+%    \begin{macrocode}
 \def\filehook@include@atend{%
   \@nameuse{\filehook@include@atend@\filenamefilearg}%
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@include@after}
+%    \begin{macrocode}
 \def\filehook@include@after{%
   \@nameuse{\filehook@include@after@\filenamefilearg}%
   \filehook@every@atend
 }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
-% \end{macro}
 %
 % \begin{macro}{\filehook@input@atbegin}
-% \begin{macro}{\filehook@input@atend}
 %    \begin{macrocode}
 \def\filehook@input@atbegin{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
@@ -444,6 +448,11 @@
   \@nameuse{\filehook@input@atbegin@\filehookfilename}%
   % New stuff is added here
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@input@atend}
+%    \begin{macrocode}
 \def\filehook@input@atend{%
   % New stuff is added here
   \@nameuse{\filehook@input@atend@\filehookfilename}%
@@ -451,32 +460,35 @@
 }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
 %
 % \begin{macro}{\filehook@atbegin}
-% \begin{macro}{\filehook@atend}
 %    \begin{macrocode}
 \def\filehook@atbegin{%
   \@nameuse{\filehook@atbegin@\filehookfilename}%
   % New stuff is added here
 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@atend}
+%    \begin{macrocode}
 \def\filehook@atend{%
   % New stuff is added here
   \@nameuse{\filehook@atend@\filehookfilename}%
 }
 %    \end{macrocode}
 % \end{macro}
-% \end{macro}
 %
 % \begin{macro}{\filehook@every@atbegin}
-% \begin{macro}{\filehook@every@atend}
 %    \begin{macrocode}
-\def\filehook@every@atbegin{%
-}
-\def\filehook@every@atend{%
-}
+\def\filehook@every@atbegin{}
 %    \end{macrocode}
 % \end{macro}
+%
+% \begin{macro}{\filehook@every@atend}
+%    \begin{macrocode}
+\def\filehook@every@atend{}
+%    \end{macrocode}
 % \end{macro}
 %
 %
@@ -786,10 +798,17 @@
 % The \Macro{@input@} and \Macro{@iinput} macros from |latex.ltx| are redefined to install the hooks.
 %
 % First the original definitions are saved away.
+% \begin{macro}{\filehook@orig@@input@}
 %    \begin{macrocode}
 \let\filehook@orig@@input@\@input@
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@orig@@iinput}
+%    \begin{macrocode}
 \let\filehook@orig@@iinput\@iinput
 %    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\@input@}
 % This macro is redefined for the \Macro{include} file hooks.
@@ -830,133 +849,184 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%
+%
 % The |filehook| default definition of \Macro{InputIfFileExists} is defined here
 % together with alternatives definitions for comparison.
-% There are stored in a macro which is expanded if required.
+% There are stored first in a token register and later stored in a macro which is expanded if required.
 % This is always done inside a group to keep them temporary only.
-%    \begin{macrocode}
-\def\filehook@alt@InputIfFileExists{%
+% The token register is used to avoid doubling of macro argument characters.
 %
-\long\def\latex@InputIfFileExists##1##2{%
-  \IfFileExists{##1}%
-    {##2\@addtofilelist{##1}%
+%    \begin{macrocode}
+\begingroup
+\toks@={%}
+%    \end{macrocode}
+%
+% \begin{macro}{\latex@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\latex@InputIfFileExists#1#2{%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}%
      \@@input\@filef@und
     }%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\gdef\filehook@default@InputIfFileExists##1##2{%
-  \IfFileExists{##1}%
-    {##2\@addtofilelist{##1}%
+%
+% \begin{macro}{\filehook@default@InputIfFileExists}
+%    \begin{macrocode}
+\long\gdef\filehook@default@InputIfFileExists#1#2{%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}%
      \filehook@every@atbegin
-     \filehook@parsefile{##1}%
+     \filehook@parsefile{#1}%
      \filehook@atbegin
      \@@input\@filef@und
-     \filehook@parsefile{##1}%
+     \filehook@parsefile{#1}%
      \filehook@atend
      \filehook@every@atend
     }%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\gdef\filehook@@default@InputIfFileExists##1##2{%
+% \begin{macro}{\filehook@@default@InputIfFileExists}
+%    \begin{macrocode}
+\long\gdef\filehook@@default@InputIfFileExists#1#2{%
   \let\InputIfFileExists\filehook@InputIfFileExists
-  \IfFileExists{##1}%
-    {##2\@addtofilelist{##1}%
-     \filehook@parsefile{##1}%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}%
+     \filehook@parsefile{#1}%
      \filehook@atbegin
      \@@input\@filef@und
      \filehook@atend
     }%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\def\memoir@InputIfFileExists##1##2{%
-  \IfFileExists{##1}%
-    {##2\@addtofilelist{##1}\m@matbeginf{##1}%
+% \begin{macro}{\memoir@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\memoir@InputIfFileExists#1#2{%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}\m@matbeginf{#1}%
      \@@input \@filef@und
-     \m@matendf{##1}%
-     \killm@matf{##1}}%
+     \m@matendf{#1}%
+     \killm@matf{#1}}%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\def\scrlfile@InputIfFileExists##1##2{%
+% \begin{macro}{\scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\scrlfile@InputIfFileExists#1#2{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname ##1-@alias\endcsname\relax
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
   \else
-    \scr@replacefile@msg{\csname ##1-@alias\endcsname}{##1}%
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
     \expandafter\@firstoftwo
   \fi
   {%
     \expandafter\InputIfFileExists\expandafter{\csname
-      ##1-@alias\endcsname}{##2}%
+      #1-@alias\endcsname}{#2}%
   }%
-  {\IfFileExists{##1}{%
-      \scr@load@hook{before}{##1}%
-      ##2\@addtofilelist{##1}%
+  {\IfFileExists{#1}{%
+      \scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
       \@@input \@filef@und
-      \scr@load@hook{after}{##1}%
+      \scr@load@hook{after}{#1}%
     }}%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\def\filehook@scrlfile@InputIfFileExists##1##2{%
+% \begin{macro}{\filehook@scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\filehook@scrlfile@InputIfFileExists#1#2{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname ##1-@alias\endcsname\relax
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
   \else
-    \scr@replacefile@msg{\csname ##1-@alias\endcsname}{##1}%
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
     \expandafter\@firstoftwo
   \fi
   {%
     \expandafter\InputIfFileExists\expandafter{\csname
-      ##1-@alias\endcsname}{##2}%
+      #1-@alias\endcsname}{#2}%
   }%
-  {\IfFileExists{##1}{%
-      \scr@load@hook{before}{##1}%
-      ##2\@addtofilelist{##1}%
-      \filehook@parsefile{##1}%
+  {\IfFileExists{#1}{%
+      \scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \filehook@parsefile{#1}%
       \filehook@every@atbegin
       \filehook@atbegin
       \@@input \@filef@und
-      \filehook@parsefile{##1}%
+      \filehook@parsefile{#1}%
       \filehook@atend
       \filehook@every@atend
-      \scr@load@hook{after}{##1}%
+      \scr@load@hook{after}{#1}%
     }}%
 }
+%    \end{macrocode}
+% \end{macro}
 %
-\long\def\filehook@@scrlfile@InputIfFileExists##1##2{%
+% \begin{macro}{\filehook@@scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\filehook@@scrlfile@InputIfFileExists#1#2{%
   \let\InputIfFileExists\filehook@InputIfFileExists
   \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname ##1-@alias\endcsname\relax
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
   \else
-    \scr@replacefile@msg{\csname ##1-@alias\endcsname}{##1}%
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
     \expandafter\@firstoftwo
   \fi
   {%
     \expandafter\InputIfFileExists\expandafter{\csname
-      ##1-@alias\endcsname}{##2}%
+      #1-@alias\endcsname}{#2}%
   }%
-  {\IfFileExists{##1}{%
-      \scr@load@hook{before}{##1}%
-      ##2\@addtofilelist{##1}%
-      \filehook@parsefile{##1}%
+  {\IfFileExists{#1}{%
+      \scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \filehook@parsefile{#1}%
       \filehook@atbegin
       \@@input \@filef@und
-      \filehook@parsefile{##1}%
+      \filehook@parsefile{#1}%
       \filehook@atend
-      \scr@load@hook{after}{##1}%
+      \scr@load@hook{after}{#1}%
     }}%
 }
+%    \end{macrocode}
+% \end{macro}
 %
+%    \begin{macrocode}
+}
+%    \end{macrocode}
+%
+% \begin{macro}{\filehook@alt@InputIfFileExists}
+% The default and alternate definitions of \Macro\InputIfFileExists are now
+% stored in this macro. It is marked as `onlypreamble', which will also clear
+% the macro when it is not needed anymore.
+%    \begin{macrocode}
+\xdef\filehook@alt@InputIfFileExists{%
+    \the\toks@
 }
 \@onlypreamble\filehook@alt@InputIfFileExists
 %    \end{macrocode}
+% \end{macro}
 %
+%    \begin{macrocode}
+\endgroup
+%    \end{macrocode}
+%
+% \begin{macro}{\filehook@if@scrlfile}
 % If the |scrlfile| package definition is detected the |filehook|s are added
 % to that definition. Unfortunately the \Macro{scr@load@hook}{before} hook is placed \emph{before}
 % not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
 % Note that this will stop working if |scrlfile| ever changes its definition of the \Macro{InputIfFileExists} macro.
 %    \begin{macrocode}
-%
 \def\filehook@if@scrlfile#1{%
   \@ifpackageloaded {scrlfile}{%
   \ifx\InputIfFileExists\scrlfile@InputIfFileExists
@@ -979,7 +1049,11 @@
   #1}%
 }
 \@onlypreamble\filehook@if@scrlfile
+%    \end{macrocode}
+% \end{macro}
 %
+% \begin{macro}{\filehook@if@memoir}
+%    \begin{macrocode}
 \def\filehook@if@memoir#1{%
   \@ifclassloaded {memoir}{%
   \ifx\InputIfFileExists\memoir@InputIfFileExists
@@ -1006,7 +1080,9 @@
 }
 \@onlypreamble\filehook@if@memoir
 %    \end{macrocode}
+% \end{macro}
 %
+% \begin{macro}{\InputIfFileExists}
 % The default and alternative definitions of \Macro\InputIfFileExists are first expanded inside a group.
 %    \begin{macrocode}
 \begingroup
@@ -1071,6 +1147,8 @@
 }}
 \endgroup
 %    \end{macrocode}
+% \end{macro}
+%
 %    \begin{macrocode}
 \AtBeginDocument{%
     \ifx\InputIfFileExists\filehook@InputIfFileExists\else
