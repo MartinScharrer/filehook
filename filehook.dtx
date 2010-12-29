@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1951 2010-12-29 15:46:04Z martin $
+%% $Id: filehook.dtx 1954 2010-12-29 19:17:15Z martin $
 % \fi
 %
 % \iffalse
@@ -420,7 +420,7 @@
 \def\filehook@include@atbegin{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
   \filehook@every@atbegin
-  \@nameuse{\filehook@include@atbegin@\filenamefilearg}%
+  \@nameuse{\filehook@include@atbegin@\filehookfilearg}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -428,7 +428,7 @@
 % \begin{macro}{\filehook@include@atend}
 %    \begin{macrocode}
 \def\filehook@include@atend{%
-  \@nameuse{\filehook@include@atend@\filenamefilearg}%
+  \@nameuse{\filehook@include@atend@\filehookfilearg}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -436,7 +436,7 @@
 % \begin{macro}{\filehook@include@after}
 %    \begin{macrocode}
 \def\filehook@include@after{%
-  \@nameuse{\filehook@include@after@\filenamefilearg}%
+  \@nameuse{\filehook@include@after@\filehookfilearg}%
   \filehook@every@atend
 }
 %    \end{macrocode}
