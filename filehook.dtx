@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1948 2010-12-28 23:55:05Z martin $
+%% $Id: filehook.dtx 1949 2010-12-29 13:02:53Z martin $
 % \fi
 %
 % \iffalse
@@ -50,7 +50,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{679}
+% \CheckSum{655}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -120,8 +120,10 @@
 % it is executed \emph{after} the page break (\Macro{clearpage}) is inserted by the \Macro{include} code. In contrast, the `AtEnd' hook is executed before the trailing page break 
 % and the `AtBegin' hook is executed after the \emph{leading} page break.
 %
-% The first three groups includes general and file specific hooks. The general hooks are executed for every file of this group and provide the file name as argument |#1|.
+% The first three groups includes general and file specific hooks. The general hooks are executed for every file of this group.
 % The file specific ones are only executed for a certain file. The package and class hocks are always specific to one file.
+% Older versions of this package provided the file name as argument |#1| for the general hooks. This has now (v0.4 from 2010/12/28) changed:
+% the hook code is stored and executed without modifications, i.e.\ macro argument characters (|#|) are now handled like normal and don't have to be doubled.
 %
 % The below macros can be used to add material (\TeX{} code) to the related hooks. All `AtBegin' macros will \emph{append} the code to the hooks, but the
 % `AtEnd' and `After' macros will \emph{prefix} the code instead. This ensures that two different packages adding material in `AtBegin'/`AtEnd' pairs do not
@@ -380,7 +382,17 @@
 % A workaround for this issue is to temporally redefine \Macro{input} to \Macro{@input} for \Macro{lstinputlisting}:\\
 % |   {\let\input\@input\lstinputlisting{...}}|.
 %
+% \section{Upgrade Guide}
+% This sections gives information for users of older (pre 1.0) versions of this package which unfortunately might not be 100\% backwards compatible.
 %
+% \subsection{Upgrade to v0.4 - 2010/12/28}
+% \begin{itemize}
+%   \item The macro \Macro\AfterIncludeFile was misspelled as \Macro\AfterOfIncludeFile in the implementation of earlier versions, but not in the documentation.
+%   This has now be corrected. Please adjust your code to use the correct name and to require the |filehook| package from 2010/12/28.
+%   \item All general hooks (the one not taking a file argument) used to have an implicit argument |#1| which was expanded to the file name (i.e.\ the argument of \Macro\input etc.).
+%    This has now be changed, so that macro arguments are not handled special in hook code. Older hooks which use this argument should either use \Macro\filehookfilearg\relax
+%    (identical to the old |#1|) or \Macro\filehookfilename (parsed argument, always with file extension). These macros are available in \emph{all} hooks.
+% \end{itemize}
 %
 % \StopEventually{}
 % \section{Implementation}\label{sec:impl}
@@ -835,7 +847,7 @@
 \long\gdef\filehook@default@InputIfFileExists##1##2{%
   \IfFileExists{##1}%
     {##2\@addtofilelist{##1}%
-     \filehook@every@atbegin{##1}%
+     \filehook@every@atbegin
      \filehook@parsefile{##1}%
      \filehook@atbegin
      \@@input\@filef@und
