@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1967 2010-12-30 20:44:02Z martin $
+%% $Id: filehook.dtx 1968 2010-12-30 23:58:11Z martin $
 % \fi
 %
 % \iffalse
@@ -101,7 +101,7 @@
 % \vspace{1.2em}%
 %
 % \begin{abstract}
-% This small package provides hooks for input files. Document and package authors can use these hooks to
+% This package provides hooks for input files. Document and package authors can use these hooks to
 % execute code at begin or the end of specific or all input files.
 % \end{abstract}
 %
@@ -110,26 +110,40 @@
 % These package changes some internal \LaTeX{} macros used to load input files so that they include `hooks'.
 % A hook is an (internal) macro executed at specific points. Normally it is initially empty, but can be extended using
 % an user level macro. The most common hook in \LaTeX{} is the `At-Begin-Document' hook. Code can be added to this hook
-% using \Macro{AtBeginDocument}{<\TeX code>}.
+% using \Macro\AtBeginDocument{<\TeX code>}.
 %
+%
+% This package provides hooks for files read by the \LaTeX{} macros \Macro\input, \Macro\include and 
+% \Macro\InputIfFileExists as well as (since v0.3 from 2010/12/20) for class and package files, 
+% i.e. macros \Macro\documentclass, \Macro\LoadClassWithOptions and \Macro\LoadClass
+% as well as \Macro\usepackage, \Macro\RequirePackageWithOptions and \Macro\RequirePackage.
+% Note that \Macro\InputIfFileExists, and therefore its hooks, is used by the aforementioned macros.
+% In v0.4 from 2010/12/30 special hooks where added which are executed for every read file, but will not be
+% executed a second time by the internal \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
+%
+% For all files a `AtBegin' and a `AtEnd' hook is installed. For \Macro\include files there is also a `After' hook which
+% it is executed \emph{after} the page break (\Macro\clearpage) is inserted by the \Macro\include code.
+% In contrast, the `AtEnd' hook is executed before the trailing page break 
+% and the `AtBegin' hook is executed after the \emph{leading} page break.
+% The `AtBegin' hook can be used to set macros to file specific values.
+% These macros can be reset in the `AtEnd' hook to the parent file values.
+% If these macros appear in the page header or footer they need to be reset `After' hook
+% to ensure that the correct values are used for the last page.
+%
+% In addition to general hooks which are executed for all files of there type,
+% file specific one can be defined which are only executed for the named file.
+% The hooks for classes and packages are always specific to one file.
+%
+% Older versions of this package provided the file name as argument |#1| for the general hooks.
+% This has been changed in v0.4 from 2010/12/30: the hook code is stored and executed without modifications,
+% i.e.\ macro argument characters (|#|) are now handled like normal and don't have to be doubled.
+% See section~\ref{sec:upgrade} for information how to upgrade older documents.
 %
 % \section{Usage}
-% This package provides several groups of hooks: for file read using \Macro{input}, for files read using \Macro{include} and for all read files (i.e.\ all files read using
-% \Macro{InputIfFileExists}, which includes package and class files, but also \Macro\input and \Macro\include files).
-% Since v0.3 from 2010/12/20 there are also hooks for package and class files.
-% Since v0.4 from 2010/12/30 there are also special hooks which can be used to executed code for every file.
-% All groups include a `AtBegin' and a `AtEnd' macro. The \Macro{include} group has also a `After' hook which
-% it is executed \emph{after} the page break (\Macro{clearpage}) is inserted by the \Macro{include} code. In contrast, the `AtEnd' hook is executed before the trailing page break 
-% and the `AtBegin' hook is executed after the \emph{leading} page break.
-%
-% The first three groups includes general and file specific hooks. The general hooks are executed for every file of this group.
-% The file specific ones are only executed for a certain file. The package and class hocks are always specific to one file.
-% Older versions of this package provided the file name as argument |#1| for the general hooks. This has now (v0.4 from 2010/12/30) changed:
-% the hook code is stored and executed without modifications, i.e.\ macro argument characters (|#|) are now handled like normal and don't have to be doubled.
-%
-% The below macros can be used to add material (\TeX{} code) to the related hooks. All `AtBegin' macros will \emph{append} the code to the hooks, but the
-% `AtEnd' and `After' macros will \emph{prefix} the code instead. This ensures that two different packages adding material in `AtBegin'/`AtEnd' pairs do not
-% overlap each other. Instead the later used package adds the code closer to the file content, `inside' the material added by the first package.
+% The below macros can be used to add material (\TeX{} code) to the related hooks.
+% All `AtBegin' macros will \emph{append} the code to the hooks, but the `AtEnd' and `After' macros will \emph{prefix} the code instead.
+% This ensures that two different packages adding material in `AtBegin'/`AtEnd' pairs do not overlap each other.
+% Instead the later used package adds the code closer to the file content, `inside' the material added by the first package.
 % Therefore it is safely possible to surround the content of a file with multiple \LaTeX{} environments using multiple `AtBegin'/`AtEnd' macro calls.
 % If required inside another package a different order can be enforced by using the internal hook macros shown in the implementation section.
 %
@@ -177,7 +191,7 @@
 % \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
 % Sometime certain code should be executed at the begin and end of every read file, e.g.\ pushing and popping a file stack.
-% The \Macro{At...OfFiles} hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
+% The \Macro\At...OfFiles hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
 % The \Macro\AtEndOfFiles is executed before it, which can cause issues with page headers and footers.
 % A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
 % once in the |include| related hooks and once in the |OfFiles| hooks.
@@ -203,17 +217,17 @@
 %
 % \DescribeMacro{\AtBeginOfFiles}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFiles}{<\TeX\ code>}
-% These macros add the given \marg{code} to two hooks executed for all files read using the \Macro{InputIfFileExists} macro. This macro is used internally by the 
-% \Macro{input}, \Macro{include} and \Macro{usepackage}/\Macro{RequirePackage} macros. Packages and classes might use it to include additional or auxiliary files.
-% Authors can exclude those files from the hooks by using \Macro{IfFileExists}{<file name>}|{\@input\@filef@und}{}| instead.
+% These macros add the given \marg{code} to two hooks executed for all files read using the \Macro\InputIfFileExists macro. This macro is used internally by the 
+% \Macro\input, \Macro\include and \Macro\usepackage/\Macro\RequirePackage macros. Packages and classes might use it to include additional or auxiliary files.
+% Authors can exclude those files from the hooks by using \Macro\IfFileExists{<file name>}|{\@input\@filef@und}{}| instead.
 %
 % \DescribeMacro{\AtBeginOfFile}{<file name with extension>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFile}{<file name with extension>}{<\TeX\ code>}
 % Like the {\expandafter\Macro\csname...OfIncludeFile\endcsname{<file name>}{<\TeX\ code>}} macros above, just for `all' read files. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
 %
-% The `all files' hooks are closer to the file content than the \Macro{input} and \Macro{include} hook, i.e.\ the \Macro{AtBeginOfFiles} comes \emph{after} the \Macro{AtBeginOfIncludes} and
-% the \Macro{AtEndOfFiles} comes \emph{before} the \Macro{AtEndOfIncludes} hook.
+% The `all files' hooks are closer to the file content than the \Macro\input and \Macro\include hook, i.e.\ the \Macro\AtBeginOfFiles comes \emph{after} the \Macro\AtBeginOfIncludes and
+% the \Macro\AtEndOfFiles comes \emph{before} the \Macro\AtEndOfIncludes hook.
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
 % \centerline{\DrawInputIf{}}
@@ -223,10 +237,10 @@
 % \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AfterIncludes}{<\TeX\ code>}
-% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro{include}.
+% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro\include.
 % The code can use the macro argument |#1|
 % which will be expanded to the include \meta{file name}, i.e.\ the hooks are macros with one argument which will be the file name.
-% As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro{clearpage}.
+% As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro\clearpage.
 % Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd` hook, to ensure
 % that the old values are still valid for the last page.
 %
@@ -234,8 +248,8 @@
 % \DescribeMacro{\AtEndOfIncludeFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AfterIncludeFile}{<file name>}{<\TeX\ code>}
 % These file-specific macros take the two arguments. The \meta{code} is only executed for the file with the given \meta{file name}
-% and only if it is read using \Macro{include}. It is not allowed to use macro arguments inside the code.
-% The \meta{file name} should be identical to the name used for \Macro{include} and not include the `|.tex|' extension.
+% and only if it is read using \Macro\include. It is not allowed to use macro arguments inside the code.
+% The \meta{file name} should be identical to the name used for \Macro\include and not include the `|.tex|' extension.
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
 % \centerline{\hbox{\vbox{%
@@ -262,12 +276,12 @@
 %
 % \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
-% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro{input}. Again, the macro argument |#1| can be used inside the \meta{code} and
+% Like the \Macro\...OfIncludes{code} macros above, just for file read using \Macro\input. Again, the macro argument |#1| can be used inside the \meta{code} and
 % will be expanded to the \meta{file name}.
 %
 % \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
-% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro{input}. Here the \meta{file name} should include the file
+% Like the \Macro\...OfIncludeFile{<file name>}{code} macros above, just for file read using \Macro\input. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
@@ -339,7 +353,7 @@
 %
 %
 % \section{Compatibility Issues with other Packages}
-% The |filehook| package might clash with other packages or classes which also redefine \Macro{InputIfFileExists}.
+% The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists.
 % Special compatibility code is in place for the known packages listed below (in their current implementation).
 % If any other unknown definition is found an error will be raised. The package option `|force|' can be used
 % to prevent this and to force the redefinition of this macro.
@@ -348,15 +362,15 @@
 %
 %
 % \subsection*{jmlrbook}
-% The |jmlrbook| class from the |jmlr| bundle temporary redefines \Macro{InputIfFileExists} to import papers.
+% The |jmlrbook| class from the |jmlr| bundle temporary redefines \Macro\InputIfFileExists to import papers.
 % The `original' definition is saved away at load time of the package and is used internally by the new definition.
 % This means that the hooks will not be active for this imported files because |filehook| is loaded after the class.
 % This should not affect its normal usage.
-% Note that, in theory, the package could be loaded before \Macro{documentclass} using \Macro{RequirePackage} to enable the file hooks also for these files.
+% Note that, in theory, the package could be loaded before \Macro\documentclass using \Macro\RequirePackage to enable the file hooks also for these files.
 %
 %
 % \subsection*{memoir}
-% The |memoir| class redefines \Macro{InputIfFileExists} to add own hooks identical to the |At...OfFiles| hooks (there called \Macro{AtBeginFile} and \Macro{AtEndFile}).
+% The |memoir| class redefines \Macro\InputIfFileExists to add own hooks identical to the |At...OfFiles| hooks (there called \Macro\AtBeginFile and \Macro\AtEndFile).
 % This hooks will be moved to the corresponding ones of |filehook| and will keep working as normal.
 % Since v0.4 from 2010/12/30 this modification will be also applied when the |filehook| package is loaded (using \Macro\RequirePackage) \emph{before} the
 % |memoir| class. However, the hooks from |filehook| need to be temporally disabled while reading the |memoir| class.
@@ -366,7 +380,7 @@
 %
 %
 % \subsection*{scrlfile}
-% The |scrlfile| package from the \emph{koma-script} bundle redefines \Macro{InputIfFileExists} to allow file name aliases and to also add hooks.
+% The |scrlfile| package from the \emph{koma-script} bundle redefines \Macro\InputIfFileExists to allow file name aliases and to also add hooks.
 % If required it should be loaded before |filehook|, which will add its hooks correctly to the modified definition.
 % Since v0.4 from 2010/12/30 this modification will be also applied when the |scrlfile| package is loaded after |filehook|.
 %
@@ -374,21 +388,22 @@
 % \subsection*{fink}
 % The |filehook| and |currfile| packages where written as replacements for the |fink| package, where |filehook| provides the necessary hooks for |currfile|.
 % The |fink| package has now been deprecated in favour of |currfile| and should not be used anymore. The |fink| compatibility code has been removed from |filehook|
-% and both cannot be used successfully together as both redefine the \Macro{InputIfFileExists} macro.
+% and both cannot be used successfully together as both redefine the \Macro\InputIfFileExists macro.
 %
 %
 % \subsection*{listings}
-% The \pkg{listings} package uses \Macro{input} inside \Macro{lstinputlisting}. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
+% The \pkg{listings} package uses \Macro\input inside \Macro\lstinputlisting. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
 % Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
-% environment), any further code read using any input macro (\Macro{input}, \Macro{@input}, \Macro{@@input} (\TeX's \Macro{input}), \ldots) will be processed verbatim and typeset
+% environment), any further code read using any input macro (\Macro\input, \Macro\@input, \Macro\@@input (\TeX's \Macro\input), \ldots) will be processed verbatim and typeset
 % as part of the listing. A known package suffering from this is \pkg{svn-multi} which loads |.svx| files for every |.tex| file.
-% A workaround for this issue is to temporally redefine \Macro{input} to \Macro{@input} for \Macro{lstinputlisting}:\\
+% A workaround for this issue is to temporally redefine \Macro\input to \Macro\@input for \Macro\lstinputlisting:\\
 % |   {\let\input\@input\lstinputlisting{...}}|.
 %
 % \section{Upgrade Guide}
-% This sections gives information for users of older (pre 1.0) versions of this package which unfortunately might not be 100\% backwards compatible.
+% \label{sec:upgrade}
+% This sections gives information for users of older versions of this package which unfortunately might not be 100\% backwards compatible.
 %
-% \subsection{Upgrade to v0.4 - 2010/12/30}
+% \subsection*{Upgrade to v0.4 - 2010/12/30}
 % \begin{itemize}
 %   \item The macro \Macro\AfterIncludeFile was misspelled as \Macro\AfterOfIncludeFile in the implementation of earlier versions, but not in the documentation.
 %   This has now be corrected. Please adjust your code to use the correct name and to require the |filehook| package from 2010/12/30.
@@ -398,6 +413,7 @@
 % \end{itemize}
 %
 % \StopEventually{}
+% \clearpage
 % \section{Implementation}\label{sec:impl}
 %
 % \iffalse
@@ -798,7 +814,7 @@
 %
 %
 % \subsection{Installation of Hooks}
-% The \Macro{@input@} and \Macro{@iinput} macros from |latex.ltx| are redefined to install the hooks.
+% The \Macro\@input@ and \Macro\@iinput macros from |latex.ltx| are redefined to install the hooks.
 %
 % First the original definitions are saved away.
 % \begin{macro}{\filehook@orig@@input@}
@@ -814,10 +830,10 @@
 % \end{macro}
 %
 % \begin{macro}{\@input@}
-% This macro is redefined for the \Macro{include} file hooks.
-% Checks if the next command is \Macro{clearpage} which indicates that we are inside \Macro{@include}.
+% This macro is redefined for the \Macro\include file hooks.
+% Checks if the next command is \Macro\clearpage which indicates that we are inside \Macro\@include.
 % If so the hooks are installed, otherwise the original macro is used unchanged.
-% For the `after' hook an own \Macro{clearpage} is inserted and the original one is gobbled.
+% For the `after' hook an own \Macro\clearpage is inserted and the original one is gobbled.
 %
 %    \begin{macrocode}
 \def\@input@#1{%
@@ -838,7 +854,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@iinput}
-% This macro is redefined for the \Macro{input} file hooks.
+% This macro is redefined for the \Macro\input file hooks.
 % it simply surrounds the original macro with the hooks.
 %    \begin{macrocode}
 \def\filehook@@iinput#1{%
@@ -854,7 +870,7 @@
 %
 %
 %
-% The |filehook| default definition of \Macro{InputIfFileExists} is defined here
+% The |filehook| default definition of \Macro\InputIfFileExists is defined here
 % together with alternatives definitions for comparison.
 % There are stored first in a token register and later stored in a macro which is expanded if required.
 % This is always done inside a group to keep them temporary only.
@@ -1027,9 +1043,9 @@
 %
 % \begin{macro}{\filehook@if@scrlfile}
 % If the |scrlfile| package definition is detected the |filehook|s are added
-% to that definition. Unfortunately the \Macro{scr@load@hook}{before} hook is placed \emph{before}
+% to that definition. Unfortunately the \Macro\scr@load@hook{before} hook is placed \emph{before}
 % not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
-% Note that this will stop working if |scrlfile| ever changes its definition of the \Macro{InputIfFileExists} macro.
+% Note that this will stop working if |scrlfile| ever changes its definition of the \Macro\InputIfFileExists macro.
 %    \begin{macrocode}
 \def\filehook@if@scrlfile#1{%
   \@ifpackageloaded {scrlfile}{%
