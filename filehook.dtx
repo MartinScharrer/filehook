@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1954 2010-12-29 19:17:15Z martin $
+%% $Id: filehook.dtx 1960 2010-12-30 16:14:40Z martin $
 % \fi
 %
 % \iffalse
@@ -242,6 +242,7 @@
 %   \sffamily
 %   \hbox{\Macro\include:}%
 %   \hbox{\fbox{\vbox{%
+%    \hbox{\Macro\clearpage~~(implicit)}%
 %    \hbox{\Hook{AtBeginOfEveryFile}}%
 %    \hbox{\Hook{AtBeginOfIncludeFile}{<file name>}}%
 %    \hbox{\Hook{AtBeginOfIncludes}}%
