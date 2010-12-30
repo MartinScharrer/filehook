@@ -2,6 +2,8 @@
 \ProvidesClass{filehooktest}
 \LoadClass{minimal}
 
+\pagestyle{empty}
+
 \usepackage{filehook}[2010/12/29]
 
 \def\test#1{%
@@ -20,6 +22,7 @@
 
 \def\testmessage#1{%
     \g@addto@macro\testmessages{#1^^J}%
+    \par\noindent#1%
 }
 
 \def\reference{%
