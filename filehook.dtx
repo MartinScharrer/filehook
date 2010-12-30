@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1960 2010-12-30 16:14:40Z martin $
+%% $Id: filehook.dtx 1962 2010-12-30 17:52:41Z martin $
 % \fi
 %
 % \iffalse
@@ -882,8 +882,8 @@
 \long\gdef\filehook@default@InputIfFileExists#1#2{%
   \IfFileExists{#1}%
     {#2\@addtofilelist{#1}%
-     \filehook@every@atbegin
      \filehook@parsefile{#1}%
+     \filehook@every@atbegin
      \filehook@atbegin
      \@@input\@filef@und
      \filehook@parsefile{#1}%
@@ -903,6 +903,7 @@
      \filehook@parsefile{#1}%
      \filehook@atbegin
      \@@input\@filef@und
+     \filehook@parsefile{#1}%
      \filehook@atend
     }%
 }
