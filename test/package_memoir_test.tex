@@ -1,0 +1,45 @@
+%&pdflatex
+\documentclass{memoir}
+\RequirePackage{filehooktest}
+
+\AtBeginOfPackageFile{testpackage}{\testmessage{At Begin Of Package File `testpackage'}}
+\AtEndOfPackageFile{testpackage}{\testmessage{At End Of Package File `testpackage'}}
+\AtEndOfPackageFile*{testpackage}{\testmessage{At End Of Package File `testpackage' (star)}}
+
+\AtBeginOfFiles{\testmessage{At Begin Of Files}}
+\AtEndOfFiles{\testmessage{At End Of Files}}
+\AtBeginOfFile{testpackage.sty}{\testmessage{At Begin Of File `testpackage.sty'}}
+\AtEndOfFile{testpackage.sty}{\testmessage{At End Of File `testpackage.sty'}}
+
+\AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
+\AtEndOfEveryFile{\testmessage{At End Of Every File}}
+
+
+\test{package}
+
+\usepackage{testpackage}
+\testmessage{}
+
+\AtEndOfPackageFile{testpackage}{\testmessage{SHOULD NOT BE SHOWN: At End Of Package File `testpackage' (after package)}}
+\AtEndOfPackageFile*{testpackage}{\testmessage{At End Of Package File `testpackage' (star) (after package)}}
+
+\begin{document}
+
+\reference{%
+At Begin Of Every File
+At Begin Of Package File `testpackage'
+At Begin Of File `testpackage.sty'
+At Begin Of Files
+Content of test package
+At End Of Files
+At End Of File `testpackage.sty'
+At End Of Every File
+AtEndOfPackage hook of test package
+At End Of Package File `testpackage' (star)
+At End Of Package File `testpackage'
+
+At End Of Package File `testpackage' (star) (after package)
+}%
+\endtest
+\end{document}
+

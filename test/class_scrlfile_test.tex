@@ -1,0 +1,45 @@
+%&pdflatex
+\RequirePackage{scrlfile}
+\RequirePackage{filehooktest}
+
+\AtBeginOfClassFile{testclass}{\testmessage{At Begin Of Class File `testclass'}}
+\AtEndOfClassFile{testclass}{\testmessage{At End Of Class File `testclass'}}
+\AtEndOfClassFile*{testclass}{\testmessage{At End Of Class File `testclass' (star)}}
+
+\AtBeginOfFiles{\testmessage{At Begin Of Files}}
+\AtEndOfFiles{\testmessage{At End Of Files}}
+\AtBeginOfFile{testclass.cls}{\testmessage{At Begin Of File `testclass.cls'}}
+\AtEndOfFile{testclass.cls}{\testmessage{At End Of File `testclass.cls'}}
+
+\AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
+\AtEndOfEveryFile{\testmessage{At End Of Every File}}
+
+
+\test{class}
+
+\documentclass{testclass}
+\testmessage{}
+
+\AtEndOfClassFile{testclass}{\testmessage{SHOULD NOT BE SHOWN: At End Of Class File `testclass' (after class)}}
+\AtEndOfClassFile*{testclass}{\testmessage{At End Of Class File `testclass' (star) (after class)}}
+
+\begin{document}
+
+\reference{%
+At Begin Of Every File
+At Begin Of Class File `testclass'
+At Begin Of File `testclass.cls'
+At Begin Of Files
+Content of test class
+At End Of Files
+At End Of File `testclass.cls'
+At End Of Every File
+AtEndOfClass hook of test class
+At End Of Class File `testclass' (star)
+At End Of Class File `testclass'
+
+At End Of Class File `testclass' (star) (after class)
+}%
+\endtest
+\end{document}
+
