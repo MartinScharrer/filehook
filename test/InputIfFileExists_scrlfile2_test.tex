@@ -1,0 +1,29 @@
+%&pdflatex
+\documentclass{filehooktest}
+\RequirePackage{scrlfile}
+
+\AtBeginOfFiles{\testmessage{At Begin Of Files}}
+\AtEndOfFiles{\testmessage{At End Of Files}}
+\AtBeginOfFile{InputIfFileExists}{\testmessage{At Begin Of File{}}}
+\AtEndOfFile{InputIfFileExists}{\testmessage{At End Of File{}}}
+
+\begin{document}
+
+\begin{test}{\jobname}
+\testmessage{Main file before file}
+\InputIfFileExists{InputIfFileExists}{}{}
+\testmessage{Main file after file}
+
+\reference{%
+Main file before file
+At Begin Of File{}
+At Begin Of Files
+Content of InputIfFileExists File
+At End Of Files
+At End Of File{}
+Main file after file
+}%
+\end{test}
+
+\end{document}
+
