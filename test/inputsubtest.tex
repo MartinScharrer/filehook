@@ -1,4 +1,5 @@
 %&pdflatex
+%\RequirePackage{currfile}[2010/12/28]
 \documentclass{filehooktest}
 
 \AtBeginOfInputs{\testmessage{At Begin Of Inputs (file: \filehookfilename)}}
@@ -11,10 +12,17 @@
 \AtBeginOfFile{inputsub}{\testmessage{At Begin Of File `inputsub'}}
 \AtEndOfFile{inputsub}{\testmessage{At End Of File `inputsub'}}
 \AtBeginOfFile{sub}{\testmessage{At Begin Of File `sub'}}
-\AtEndOfFile{sub}{\testmessage{At End Of File `sub' \filehookfilename}}
+\AtEndOfFile{sub}{\testmessage{At End Of File `sub'}}
 
 \AtBeginOfEveryFile{\testmessage{At Begin Of Every File (file: \filehookfilename)}}
 \AtEndOfEveryFile{\testmessage{At End Of Every File (file: \filehookfilename)}}
+
+%\makeatletter
+%\def\filehook@parsefile#1{%
+%    \edef\filehookfilearg{#1}%
+%    \def\filehookfilename{\currfilename}%
+%}
+%\makeatother
 
 \begin{document}
 
