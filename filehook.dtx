@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1968 2010-12-30 23:58:11Z martin $
+%% $Id: filehook.dtx 1969 2010-12-31 00:02:44Z martin $
 % \fi
 %
 % \iffalse
@@ -191,7 +191,7 @@
 % \DescribeMacro{\AtBeginOfEveryFile}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfEveryFile}{<\TeX\ code>}
 % Sometime certain code should be executed at the begin and end of every read file, e.g.\ pushing and popping a file stack.
-% The \Macro\At...OfFiles hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
+% The `At...OfFiles' hooks already do a good job here. Unfortunately there is the issue with the \Macro\clearpage in \Macro\include.
 % The \Macro\AtEndOfFiles is executed before it, which can cause issues with page headers and footers.
 % A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
 % once in the |include| related hooks and once in the |OfFiles| hooks.
@@ -223,7 +223,7 @@
 %
 % \DescribeMacro{\AtBeginOfFile}{<file name with extension>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFile}{<file name with extension>}{<\TeX\ code>}
-% Like the {\expandafter\Macro\csname...OfIncludeFile\endcsname{<file name>}{<\TeX\ code>}} macros above, just for `all' read files. Here the \meta{file name} should include the file
+% Like the {\Macro{...OfIncludeFile}{<file name>}{<\TeX\ code>}} macros above, just for `all' read files. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
 %
 % The `all files' hooks are closer to the file content than the \Macro\input and \Macro\include hook, i.e.\ the \Macro\AtBeginOfFiles comes \emph{after} the \Macro\AtBeginOfIncludes and
@@ -276,12 +276,12 @@
 %
 % \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
-% Like the \Macro\...OfIncludes{code} macros above, just for file read using \Macro\input. Again, the macro argument |#1| can be used inside the \meta{code} and
+% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro\input. Again, the macro argument |#1| can be used inside the \meta{code} and
 % will be expanded to the \meta{file name}.
 %
 % \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
-% Like the \Macro\...OfIncludeFile{<file name>}{code} macros above, just for file read using \Macro\input. Here the \meta{file name} should include the file
+% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro\input. Here the \meta{file name} should include the file
 % extension! The \meta{code} must not include any macro arguments (|#1|).
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
@@ -370,7 +370,7 @@
 %
 %
 % \subsection*{memoir}
-% The |memoir| class redefines \Macro\InputIfFileExists to add own hooks identical to the |At...OfFiles| hooks (there called \Macro\AtBeginFile and \Macro\AtEndFile).
+% The |memoir| class redefines \Macro\InputIfFileExists to add own hooks identical to the `At...OfFiles' hooks (there called \Macro\AtBeginFile and \Macro\AtEndFile).
 % This hooks will be moved to the corresponding ones of |filehook| and will keep working as normal.
 % Since v0.4 from 2010/12/30 this modification will be also applied when the |filehook| package is loaded (using \Macro\RequirePackage) \emph{before} the
 % |memoir| class. However, the hooks from |filehook| need to be temporally disabled while reading the |memoir| class.
@@ -1083,7 +1083,7 @@
     \AtBeginOfFiles{\expandafter\m@matbeginf\expandafter{\filehookfilearg}}%
     \AtEndOfFiles{\expandafter\m@matendf\expandafter{\filehookfilearg}%
                   \expandafter\killm@matf\expandafter{\filehookfilearg}}%
-    \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the 'At...OfFiles' hooks}
+    \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the `At...OfFiles' hooks}
   \else
     \iffilehook@force
       \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
@@ -1124,7 +1124,7 @@
   }%
 %    \end{macrocode}
 % If |memoir| is detected its hooks
-% are added to the appropriate |At...OfFiles| hooks. This works fine because its hooks have the
+% are added to the appropriate `At...OfFiles' hooks. This works fine because its hooks have the
 % exact same position. Please note that the case when |memoir| is used together with |scrlfile| is not explicitly covered.
 % In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
