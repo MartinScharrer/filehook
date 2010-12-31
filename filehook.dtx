@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1969 2010-12-31 00:02:44Z martin $
+%% $Id: filehook.dtx 1970 2010-12-31 00:33:34Z martin $
 % \fi
 %
 % \iffalse
@@ -147,6 +147,17 @@
 % Therefore it is safely possible to surround the content of a file with multiple \LaTeX{} environments using multiple `AtBegin'/`AtEnd' macro calls.
 % If required inside another package a different order can be enforced by using the internal hook macros shown in the implementation section.
 %
+% \DescribeMacro{\filehookfilearg}
+% \DescribeMacro{\filehookfilename}
+% These two macros\marginpar{New in v0.4 2010/12/30} can be used inside all hooks.
+% The macro \Macro\filehookfilearg holds the original argument to the 
+% macro which was used to read the file (e.g.\ \Macro\input{<arg>}),
+% which may or may not hold a file extension.
+% Note that a missing file extension always defaults in \TeX{} to `|.tex|'.
+% The full file name with extension (and maybe a file path) is provided by
+% \Macro\filehookfilename.
+% The macros of the partner package \pkg{currfile} can be used to access further file path
+% elements inside or outside of the hooks.
 %
 %^^A Some internal macros to draw the hook positions:
 % \def\Hook#1{\textsf{Hook: #1}\MacroArgs}
@@ -224,7 +235,7 @@
 % \DescribeMacro{\AtBeginOfFile}{<file name with extension>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFile}{<file name with extension>}{<\TeX\ code>}
 % Like the {\Macro{...OfIncludeFile}{<file name>}{<\TeX\ code>}} macros above, just for `all' read files. Here the \meta{file name} should include the file
-% extension! The \meta{code} must not include any macro arguments (|#1|).
+% extension!
 %
 % The `all files' hooks are closer to the file content than the \Macro\input and \Macro\include hook, i.e.\ the \Macro\AtBeginOfFiles comes \emph{after} the \Macro\AtBeginOfIncludes and
 % the \Macro\AtEndOfFiles comes \emph{before} the \Macro\AtEndOfIncludes hook.
@@ -237,18 +248,15 @@
 % \DescribeMacro{\AtBeginOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludes}{<\TeX\ code>}
 % \DescribeMacro{\AfterIncludes}{<\TeX\ code>}
-% All these macros take one argument (some \TeX{} code) which is added to the specific hook for files read using \Macro\include.
-% The code can use the macro argument |#1|
-% which will be expanded to the include \meta{file name}, i.e.\ the hooks are macros with one argument which will be the file name.
 % As described above the `AtEnd' hook is executed before and the `After' hook is executed after the trailing \Macro\clearpage.
-% Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd` hook, to ensure
+% Note that material which appears in the page header or footer should be updated in the `After' hook, not the `AtEnd' hook, to ensure
 % that the old values are still valid for the last page.
 %
 % \DescribeMacro{\AtBeginOfIncludeFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfIncludeFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AfterIncludeFile}{<file name>}{<\TeX\ code>}
 % These file-specific macros take the two arguments. The \meta{code} is only executed for the file with the given \meta{file name}
-% and only if it is read using \Macro\include. It is not allowed to use macro arguments inside the code.
+% and only if it is read using \Macro\include.
 % The \meta{file name} should be identical to the name used for \Macro\include and not include the `|.tex|' extension.
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
@@ -276,13 +284,12 @@
 %
 % \DescribeMacro{\AtBeginOfInputs}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputs}{<\TeX\ code>}
-% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro\input. Again, the macro argument |#1| can be used inside the \meta{code} and
-% will be expanded to the \meta{file name}.
+% Like the \Macro{...OfIncludes}{code} macros above, just for file read using \Macro\input.
 %
 % \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
 % Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro\input. Here the \meta{file name} should include the file
-% extension! The \meta{code} must not include any macro arguments (|#1|).
+% extension!
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
 % \centerline{\hbox{\vbox{%
@@ -351,7 +358,7 @@
 % }}}
 %
 %
-%
+% \clearpage
 % \section{Compatibility Issues with other Packages}
 % The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists.
 % Special compatibility code is in place for the known packages listed below (in their current implementation).
@@ -541,7 +548,7 @@
 % \end{macro}
 %
 % \begin{macro}{\filehook@prefix}
-% Prefixes code without an argument to a hook.
+% Prefixes code to a hook.
 %    \begin{macrocode}
 \long\def\filehook@prefix#1#2{%
   \begingroup
