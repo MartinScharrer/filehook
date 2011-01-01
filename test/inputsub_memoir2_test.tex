@@ -3,20 +3,20 @@
 \RequirePackage{filehooktest}
 \documentclass{memoir}
 
-\AtBeginOfInputs{\testmessage{At Begin Of Inputs (file: \filehookfilename)}}
-\AtEndOfInputs{\testmessage{At End Of Inputs (file: \filehookfilename)}}
+\AtBeginOfInputs{\testmessage{At Begin Of Inputs}}
+\AtEndOfInputs{\testmessage{At End Of Inputs}}
 \AtBeginOfInputFile{inputsub}{\testmessage{At Begin Of Input File `inputsub'}}
 \AtEndOfInputFile{inputsub}{\testmessage{At End Of Input File `inputsub'}}
 
-\AtBeginOfFiles{\testmessage{At Begin Of Files (file: \filehookfilename)}}
-\AtEndOfFiles{\testmessage{At End Of Files (file: \filehookfilename)}}
+\AtBeginOfFiles{\testmessage{At Begin Of Files}}
+\AtEndOfFiles{\testmessage{At End Of Files}}
 \AtBeginOfFile{inputsub}{\testmessage{At Begin Of File `inputsub'}}
 \AtEndOfFile{inputsub}{\testmessage{At End Of File `inputsub'}}
 \AtBeginOfFile{sub}{\testmessage{At Begin Of File `sub'}}
 \AtEndOfFile{sub}{\testmessage{At End Of File `sub'}}
 
-\AtBeginOfEveryFile{\testmessage{At Begin Of Every File (file: \filehookfilename)}}
-\AtEndOfEveryFile{\testmessage{At End Of Every File (file: \filehookfilename)}}
+\AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
+\AtEndOfEveryFile{\testmessage{At End Of Every File}}
 
 %\makeatletter
 %\def\filehook@parsefile#1{%
@@ -34,26 +34,26 @@
 
 \reference{%
 Main file before inputsub file
-At Begin Of Every File (file: inputsub.tex)
+At Begin Of Every File
 At Begin Of Input File `inputsub'
-At Begin Of Inputs (file: inputsub.tex)
+At Begin Of Inputs
 At Begin Of File `inputsub'
-At Begin Of Files (file: inputsub.tex)
+At Begin Of Files
 Content of Input File
 
-At Begin Of Every File (file: sub.tex)
+At Begin Of Every File
 At Begin Of File `sub'
-At Begin Of Files (file: sub.tex)
+At Begin Of Files
 Content of Sub File
-At End Of Files (file: sub.tex)
+At End Of Files
 At End Of File `sub'
-At End Of Every File (file: sub.tex)
+At End Of Every File
 
-At End Of Files (file: inputsub.tex)
+At End Of Files
 At End Of File `inputsub'
-At End Of Inputs (file: inputsub.tex)
+At End Of Inputs
 At End Of Input File `inputsub'
-At End Of Every File (file: inputsub.tex)
+At End Of Every File
 Main file after inputsub file
 }%
 \end{test}

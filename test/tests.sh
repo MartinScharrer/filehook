@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #TESTFILES="includetest InputIfFileExiststest inputtest packagetest classtest"
-TESTFILES=*test.tex
+TESTFILES=${@-*test.tex}
 
 for FILE in $TESTFILES
 do
