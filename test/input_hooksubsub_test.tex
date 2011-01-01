@@ -1,0 +1,72 @@
+%&pdflatex
+%\RequirePackage{currfile}[2010/12/28]
+\documentclass{filehooktest}
+
+\AtBeginOfInputs{\testmessage{At Begin Of Inputs}}
+\AtEndOfInputs{\testmessage{At End Of Inputs}}
+\AtBeginOfInputFile{input}{\testmessage{At Begin Of Input File `input'}}
+\AtEndOfInputFile{input}{\testmessage{At End Of Input File `input'}}
+
+\AtBeginOfFiles{\testmessage{At Begin Of Files}}
+\AtEndOfFiles{\testmessage{At End Of Files}}
+\AtBeginOfFile{input}{\testmessage{At Begin Of File `input'}\testmessage{}\InputIfFileExists{sub}{}{}\testmessage{}}
+\AtEndOfFile{input}{\testmessage{At End Of File `input'}}
+\AtBeginOfFile{sub}{\testmessage{At Begin Of File `sub'}\testmessage{}\InputIfFileExists{subsub}{}{}\testmessage{}}
+\AtEndOfFile{sub}{\testmessage{At End Of File `sub'}}
+\AtBeginOfFile{subsub}{\testmessage{At Begin Of File `subsub'}}
+\AtEndOfFile{subsub}{\testmessage{At End Of File `subsub'}}
+
+\AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
+\AtEndOfEveryFile{\testmessage{At End Of Every File}}
+
+%\makeatletter
+%\def\filehook@parsefile#1{%
+%    \edef\filehookfilearg{#1}%
+%    \def\filehookfilename{\currfilename}%
+%}
+%\makeatother
+
+\begin{document}
+
+\begin{test}{\jobname}
+\testmessage{Main file before input file}
+\input{input}
+\testmessage{Main file after input file}
+
+\reference{%
+Main file before input file
+At Begin Of Every File
+At Begin Of Input File `input'
+At Begin Of Inputs
+At Begin Of File `input'
+
+At Begin Of Every File
+At Begin Of File `sub'
+
+At Begin Of Every File
+At Begin Of File `subsub'
+At Begin Of Files
+Content of SubSub File
+At End Of Files
+At End Of File `subsub'
+At End Of Every File
+
+At Begin Of Files
+Content of Sub File
+At End Of Files
+At End Of File `sub'
+At End Of Every File
+
+At Begin Of Files
+Content of Input File
+At End Of Files
+At End Of File `input'
+At End Of Inputs
+At End Of Input File `input'
+At End Of Every File
+Main file after input file
+}%
+\end{test}
+
+\end{document}
+
