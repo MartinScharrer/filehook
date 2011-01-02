@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1977 2011-01-02 15:12:31Z martin $
+%% $Id: filehook.dtx 1982 2011-01-02 19:26:14Z martin $
 % \fi
 %
 % \iffalse
@@ -37,10 +37,20 @@
 \usepackage{filehook}[2010/12/30]
 \usepackage{ifpdf}
 \usepackage{hyperref}
+\usepackage{array}
+\usepackage{booktabs}
 \EnableCrossrefs
 \CodelineIndex
 \RecordChanges
 \providecommand*\pkg{\texttt}
+\makeatletter
+\providecommand*\tablecaption{%
+    \@tempdima=\abovecaptionskip
+    \abovecaptionskip=\belowcaptionskip
+    \belowcaptionskip=\@tempdima
+    \caption
+}
+\makeatother
 \listfiles
 \begin{document}
   \DocInput{filehook.dtx}
@@ -50,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{661}
+% \CheckSum{683}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -348,13 +358,16 @@
 %
 % \clearpage
 % \section{Compatibility Issues with other Packages}
-% The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists.
-% Special compatibility code is in place for the known packages listed below (in their current implementation).
-% If any other unknown definition is found an error will be raised. The package option `|force|' can be used
-% to prevent this and to force the redefinition of this macro.
+% The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists
+% or internal macros used by \Macro\include and \Macro\input (which are \Macro\@input@ and \Macro\@iinput).
+% Special compatibility code is in place for the packages listed below (in their current implementation).
+% If any other unknown definition of \Macro\InputIfFileExists is found an error will be raised.
+% The package option `|force|' can be used to prevent this and to force the redefinition of this macro.
 % Then any previous modifications will be lost, which will most likely break the other package.
+% Table~\ref{tab:incomp} lists all packages and classes which where found do be incompatible.
+% The packages \pkg{auxhook}, \pkg{stampinclude}, \pkg{rerunfilecheck} and \pkg{excludeonly} redefine
+% one or more of the above macros but have been found compatible with |filehook|.
 % Please do not hesitate to inform the author of |filehook| of any encountered problems with other packages.
-%
 %
 % \subsection*{jmlrbook}
 % The |jmlrbook| class from the |jmlr| bundle temporary redefines \Macro\InputIfFileExists to import papers.
@@ -394,6 +407,32 @@
 % A workaround for this issue is to temporally redefine \Macro\input to \Macro\@input for \Macro\lstinputlisting:\\
 % |   {\let\input\@input\lstinputlisting{...}}|.
 %
+% \subsection*{bibliography}
+% The standard \LaTeX\ macro \Macro\bibliography uses the same internal macro \Macro\@input@ to read a file
+% as \Macro\include does.
+% The `include' hooks will also be executed for this |.bbl| file if the macro is directly followed by \Macro\clearpage,
+% because the |filehook| code will assume it is executed inside \Macro\include.
+% This rare case can be easily avoided by placing a \Macro\relax after \Macro\bibliography{\ldots}.
+%
+%
+% \begin{table}
+%    \centering
+%    \tablecaption{Incompatible packages and classes}
+%    \label{tab:incomp}
+%
+%    \begin{tabular}{>{\ttfamily}llll}
+%       \toprule
+%       Name     & Type    &  Note                          &  Affected Hooks  \\
+%       \midrule
+%       paper    & class   &  with \texttt{journal} option  &  All hocks for \Macro\include\unskip'd files \\
+%       journal  & class   &                                &  All hocks for \Macro\include\unskip'd files \\
+%       gmparts  & package &                                &  \Macro\include hooks                        \\
+%       newclude & package & formally \texttt{includex}     &  All hocks for \Macro\include\unskip'd files \\
+%       \bottomrule
+%    \end{tabular}
+% \end{table}
+%
+% \clearpage
 % \section{Upgrade Guide}
 % \label{sec:upgrade}
 % This sections gives information for users of older versions of this package which unfortunately might not be 100\% backwards compatible.
