@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1973 2011-01-01 17:14:54Z martin $
+%% $Id: filehook.dtx 1977 2011-01-02 15:12:31Z martin $
 % \fi
 %
 % \iffalse
@@ -477,7 +477,7 @@
 %    \begin{macrocode}
 \def\filehook@input@atbegin#1{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
-  \@nameuse{\filehook@input@atbegin@#1}%
+  \@nameuse{\filehook@input@atbegin@\filehook@ensureext{#1}}%
   \filehook@input@@atbegin
 }
 %    \end{macrocode}
@@ -493,7 +493,7 @@
 %    \begin{macrocode}
 \def\filehook@input@atend#1{%
   \filehook@input@@atend
-  \@nameuse{\filehook@input@atend@#1}%
+  \@nameuse{\filehook@input@atend@\filehook@ensureext{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -507,7 +507,7 @@
 % \begin{macro}{\filehook@atbegin}
 %    \begin{macrocode}
 \def\filehook@atbegin#1{%
-  \@nameuse{\filehook@atbegin@#1}%
+  \@nameuse{\filehook@atbegin@\filehook@ensureext{#1}}%
   \filehook@@atbegin
 }
 %    \end{macrocode}
@@ -523,7 +523,7 @@
 %    \begin{macrocode}
 \def\filehook@atend#1{%
   \filehook@@atend
-  \@nameuse{\filehook@atend@#1}%
+  \@nameuse{\filehook@atend@\filehook@ensureext{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -633,6 +633,20 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\filehook@addtohook}[3]{Macro which should be used to add the material to the hook}{Macro name prefix}{End of macro name (file name)}
+% The macro first expands the file name (|#3|) to flatten all included macros. An extension is added if missing, as well as the prefix.
+% All modifications of |\@tempa| are made inside a group to keep them local.
+%    \begin{macrocode}
+\def\filehook@addtohook#1#2#3{%
+  \begingroup
+  \edef\@tempa{#3}%
+  \edef\@tempa{#2\filehook@ensureext{\@tempa}}%
+  \@ifundefined{\@tempa}{\global\@namedef{\@tempa}{}}{}%
+  \expandafter\endgroup
+  \expandafter#1\csname\@tempa\endcsname
+}
+%    \end{macrocode}
+% \end{macro}
 %
 % \subsubsection*{User Level Macros}
 % The user level macros simple use the above defined macros on the appropriate hook.
@@ -664,10 +678,7 @@
 % \begin{macro}{\AtBeginOfIncludeFile}
 %    \begin{macrocode}
 \newcommand*\AtBeginOfIncludeFile[1]{%
-  \@ifundefined{\filehook@include@atbegin@#1.tex}%
-    {\global\@namedef{\filehook@include@atbegin@#1.tex}{}}%
-    {}%
-  \expandafter\filehook@append\csname\filehook@include@atbegin@#1.tex\endcsname%
+  \filehook@addtohook\filehook@append\filehook@include@atbegin@{\filehook@ensuretex{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -675,10 +686,7 @@
 % \begin{macro}{\AtEndOfIncludeFile}
 %    \begin{macrocode}
 \newcommand*\AtEndOfIncludeFile[1]{%
-  \@ifundefined{\filehook@include@atend@#1.tex}%
-    {\global\@namedef{\filehook@include@atend@#1.tex}{}}%
-    {}%
-  \expandafter\filehook@prefix\csname\filehook@include@atend@#1.tex\endcsname
+  \filehook@addtohook\filehook@prefix\filehook@include@atend@{\filehook@ensuretex{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -686,10 +694,7 @@
 % \begin{macro}{\AfterIncludeFile}
 %    \begin{macrocode}
 \newcommand*\AfterIncludeFile[1]{%
-  \@ifundefined{\filehook@include@after@#1.tex}%
-    {\long\global\@namedef{\filehook@include@after@#1.tex}{}}%
-    {}%
-  \expandafter\filehook@prefix\csname\filehook@include@after@#1.tex\endcsname
+  \filehook@addtohook\filehook@prefix\filehook@include@after@{\filehook@ensuretex{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -712,22 +717,16 @@
 %
 % \begin{macro}{\AtBeginOfInputFile}
 %    \begin{macrocode}
-\newcommand*\AtBeginOfInputFile[1]{%
-  \@ifundefined{\filehook@input@atbegin@#1}%
-    {\global\@namedef{\filehook@input@atbegin@#1}{}}%
-    {}%
-  \expandafter\filehook@append\csname\filehook@input@atbegin@#1\endcsname
+\newcommand*\AtBeginOfInputFile{%
+  \filehook@addtohook\filehook@append\filehook@input@atbegin@
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\AtEndOfInputFile}
 %    \begin{macrocode}
-\newcommand*\AtEndOfInputFile[1]{%
-  \@ifundefined{\filehook@input@atend@#1}%
-    {\global\@namedef{\filehook@input@atend@#1}{}}%
-    {}%
-  \expandafter\filehook@prefix\csname\filehook@input@atend@#1\endcsname%
+\newcommand*\AtEndOfInputFile{%
+  \filehook@addtohook\filehook@prefix\filehook@input@atend@
 }
 %    \end{macrocode}
 % \end{macro}
@@ -766,22 +765,16 @@
 %
 % \begin{macro}{\AtBeginOfFile}
 %    \begin{macrocode}
-\newcommand*\AtBeginOfFile[1]{%
-  \@ifundefined{\filehook@atbegin@#1}%
-    {\global\@namedef{\filehook@atbegin@#1}{}}%
-    {}%
-  \expandafter\filehook@append\csname\filehook@atbegin@#1\endcsname
+\newcommand*\AtBeginOfFile{%
+  \filehook@addtohook\filehook@append\filehook@atbegin@
 }
 %    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\AtEndOfFile}
 %    \begin{macrocode}
-\newcommand*\AtEndOfFile[1]{%
-  \@ifundefined{\filehook@atend@#1}%
-    {\global\@namedef{\filehook@atend@#1}{}}%
-    {}%
-  \expandafter\filehook@prefix\csname\filehook@atend@#1\endcsname
+\newcommand*\AtEndOfFile{%
+  \filehook@addtohook\filehook@prefix\filehook@atend@
 }
 %    \end{macrocode}
 % \end{macro}
@@ -931,9 +924,45 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\filehook@swap}
+% Auxiliary macro which swaps the two arguments. This is needed to expand
+% \Macro\@filef@und, which is given as first argument but needed then as the second one.
 %    \begin{macrocode}
 \def\filehook@swap#1#2{#2#1}
 %    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@ensureext}
+% This macro ensures the existence of a file name extension. If non is given `|.tex|' is
+% added.
+%    \begin{macrocode}
+\def\filehook@ensureext#1{%
+    \expandafter\filehook@@ensureext#1\empty.tex\empty\empty
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@@ensureext}
+%    \begin{macrocode}
+\def\filehook@@ensureext#1.#2\empty#3\empty{#1.#2}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\filehook@ensuretex}
+% Ensures a `|.tex|' extension, i.e. adds it if missing, even if there is a different one.
+%    \begin{macrocode}
+\def\filehook@ensuretex#1{%
+    \expandafter\filehook@@ensuretex#1\empty.tex\empty\empty
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@@ensuretex}
+%    \begin{macrocode}
+\def\filehook@@ensuretex#1.tex\empty#2\empty{#1.tex}
+%    \end{macrocode}
+% \end{macro}
 %
 %
 % The |filehook| default definition of \Macro\InputIfFileExists is defined here
