@@ -11,16 +11,16 @@
 \newwrite\handle
 
 \def\endtest{%
+  \immediate\openout\handle=\jobname.tmsg\relax
+  \immediate\write\handle{\testmessages}%
+  \immediate\handle
+  \immediate\openout\handle=\jobname.tref\relax
+  \immediate\write\handle{\thereference}%
+  \immediate\handle
   \ifx\testmessages\thereference
     \message{^^JRESULT: SUCCESS!^^J}%
   \else
     \message{^^JRESULT: FAILURE: test messages differ from reference^^J}%
-    \immediate\openout\handle=\jobname.tmsg\relax
-    \immediate\write\handle{\testmessages}%
-    \immediate\handle
-    \immediate\openout\handle=\jobname.tref\relax
-    \immediate\write\handle{\thereference}%
-    \immediate\handle
     %\show\testmessages
     %\show\thereference
   \fi
