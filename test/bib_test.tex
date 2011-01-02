@@ -1,5 +1,4 @@
 %&pdflatex
-\RequirePackage{scrlfile}
 \documentclass{filehooktest}
 
 \AtBeginOfIncludes{\testmessage{At Begin Of Includes}}
@@ -8,16 +7,11 @@
 \AtBeginOfIncludeFile{include}{\testmessage{At Begin Of Include File `include'}}
 \AtEndOfIncludeFile{include}{\testmessage{At End Of Include File `include'}}
 \AfterIncludeFile{include}{\testmessage{After Include File `include'}}
-\AtBeginOfIncludeFile{include.tex}{\testmessage{At Begin Of Include File `include' (+ext)}}
-\AtEndOfIncludeFile{include.tex}{\testmessage{At End Of Include File `include' (+ext)}}
-\AfterIncludeFile{include.tex}{\testmessage{After Include File `include' (+ext)}}
 
 \AtBeginOfFiles{\testmessage{At Begin Of Files}}
 \AtEndOfFiles{\testmessage{At End Of Files}}
-\AtBeginOfFile{include}{\testmessage{At Begin Of File `include'}}
-\AtEndOfFile{include}{\testmessage{At End Of File `include'}}
-\AtBeginOfFile{include.tex}{\testmessage{At Begin Of File `include.tex'}}
-\AtEndOfFile{include.tex}{\testmessage{At End Of File `include.tex'}}
+\AtBeginOfFile{include.tex}{\testmessage{At Begin Of File `include'}}
+\AtEndOfFile{include.tex}{\testmessage{At End Of File `include'}}
 
 \AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
 \AtEndOfEveryFile{\testmessage{At End Of Every File}}
@@ -30,27 +24,35 @@
 \include{include}
 \testmessage{Main file after include file}
 
+\testmessage{}
+\bibliography{bib}
+\relax
+\clearpage
+\testmessage{}
+
 \reference{%
 Main file before include file
 At Begin Of Every File
 At Begin Of Include File `include'
-At Begin Of Include File `include' (+ext)
 At Begin Of Includes
 At Begin Of File `include'
-At Begin Of File `include.tex'
 At Begin Of Files
 Content of Include File
 At End Of Files
-At End Of File `include.tex'
 At End Of File `include'
 At End Of Includes
-At End Of Include File `include' (+ext)
 At End Of Include File `include'
 After Includes
-After Include File `include' (+ext)
 After Include File `include'
 At End Of Every File
 Main file after include file
+
+At Begin Of Every File
+At Begin Of Files
+Content of bbl file
+At End Of Files
+At End Of Every File
+
 }%
 
 \end{test}

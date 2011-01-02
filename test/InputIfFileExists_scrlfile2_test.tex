@@ -4,8 +4,10 @@
 
 \AtBeginOfFiles{\testmessage{At Begin Of Files}}
 \AtEndOfFiles{\testmessage{At End Of Files}}
-\AtBeginOfFile{InputIfFileExists}{\testmessage{At Begin Of File{}}}
-\AtEndOfFile{InputIfFileExists}{\testmessage{At End Of File{}}}
+\AtBeginOfFile{InputIfFileExists}{\testmessage{At Begin Of File `InputIfFileExists'}}
+\AtEndOfFile{InputIfFileExists}{\testmessage{At End Of File `InputIfFileExists'}}
+\AtBeginOfFile{InputIfFileExists.tex}{\testmessage{At Begin Of File `InputIfFileExists.tex'}}
+\AtEndOfFile{InputIfFileExists.tex}{\testmessage{At End Of File `InputIfFileExists.tex'}}
 
 \begin{document}
 
@@ -14,13 +16,31 @@
 \InputIfFileExists{InputIfFileExists}{}{}
 \testmessage{Main file after file}
 
+\testmessage{}
+
+\testmessage{Main file before file}
+\InputIfFileExists{InputIfFileExists.tex}{}{}
+\testmessage{Main file after file}
+
 \reference{%
 Main file before file
-At Begin Of File{}
+At Begin Of File `InputIfFileExists'
+At Begin Of File `InputIfFileExists.tex'
 At Begin Of Files
 Content of InputIfFileExists File
 At End Of Files
-At End Of File{}
+At End Of File `InputIfFileExists.tex'
+At End Of File `InputIfFileExists'
+Main file after file
+
+Main file before file
+At Begin Of File `InputIfFileExists'
+At Begin Of File `InputIfFileExists.tex'
+At Begin Of Files
+Content of InputIfFileExists File
+At End Of Files
+At End Of File `InputIfFileExists.tex'
+At End Of File `InputIfFileExists'
 Main file after file
 }%
 \end{test}

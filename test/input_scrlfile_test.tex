@@ -6,11 +6,15 @@
 \AtEndOfInputs{\testmessage{At End Of Inputs}}
 \AtBeginOfInputFile{input}{\testmessage{At Begin Of Input File `input'}}
 \AtEndOfInputFile{input}{\testmessage{At End Of Input File `input'}}
+\AtBeginOfInputFile{input.tex}{\testmessage{At Begin Of Input File `input.tex'}}
+\AtEndOfInputFile{input.tex}{\testmessage{At End Of Input File `input.tex'}}
 
 \AtBeginOfFiles{\testmessage{At Begin Of Files}}
 \AtEndOfFiles{\testmessage{At End Of Files}}
 \AtBeginOfFile{input}{\testmessage{At Begin Of File `input'}}
 \AtEndOfFile{input}{\testmessage{At End Of File `input'}}
+\AtBeginOfFile{input.tex}{\testmessage{At Begin Of File `input.tex'}}
+\AtEndOfFile{input.tex}{\testmessage{At End Of File `input.tex'}}
 
 \AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
 \AtEndOfEveryFile{\testmessage{At End Of Every File}}
@@ -26,13 +30,17 @@
 Main file before input file
 At Begin Of Every File
 At Begin Of Input File `input'
+At Begin Of Input File `input.tex'
 At Begin Of Inputs
 At Begin Of File `input'
+At Begin Of File `input.tex'
 At Begin Of Files
 Content of Input File
 At End Of Files
+At End Of File `input.tex'
 At End Of File `input'
 At End Of Inputs
+At End Of Input File `input.tex'
 At End Of Input File `input'
 At End Of Every File
 Main file after input file

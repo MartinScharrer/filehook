@@ -6,6 +6,8 @@
 \AtEndOfInputs{\testmessage{At End Of Inputs}}
 \AtBeginOfInputFile{input}{\testmessage{At Begin Of Input File `input'}}
 \AtEndOfInputFile{input}{\testmessage{At End Of Input File `input'}}
+\AtBeginOfInputFile{input.tex}{\testmessage{At Begin Of Input File `input.tex'}}
+\AtEndOfInputFile{input.tex}{\testmessage{At End Of Input File `input.tex'}}
 
 \AtBeginOfFiles{\testmessage{At Begin Of Files}}
 \AtEndOfFiles{\testmessage{At End Of Files}}
@@ -15,6 +17,13 @@
 \AtEndOfFile{sub}{\testmessage{At End Of File `sub'}}
 \AtBeginOfFile{subsub}{\testmessage{At Begin Of File `subsub'}}
 \AtEndOfFile{subsub}{\testmessage{At End Of File `subsub'}}
+
+\AtBeginOfFile{input.tex}{\testmessage{At Begin Of File `input.tex'}}
+\AtEndOfFile{input.tex}{\testmessage{At End Of File `input.tex'}}
+\AtBeginOfFile{sub.tex}{\testmessage{At Begin Of File `sub.tex'}}
+\AtEndOfFile{sub.tex}{\testmessage{At End Of File `sub.tex'}}
+\AtBeginOfFile{subsub.tex}{\testmessage{At Begin Of File `subsub.tex'}}
+\AtEndOfFile{subsub.tex}{\testmessage{At End Of File `subsub.tex'}}
 
 \AtBeginOfEveryFile{\testmessage{At Begin Of Every File}}
 \AtEndOfEveryFile{\testmessage{At End Of Every File}}
@@ -37,6 +46,7 @@
 Main file before input file
 At Begin Of Every File
 At Begin Of Input File `input'
+At Begin Of Input File `input.tex'
 At Begin Of Inputs
 At Begin Of File `input'
 
@@ -45,23 +55,30 @@ At Begin Of File `sub'
 
 At Begin Of Every File
 At Begin Of File `subsub'
+At Begin Of File `subsub.tex'
 At Begin Of Files
 Content of SubSub File
 At End Of Files
+At End Of File `subsub.tex'
 At End Of File `subsub'
 At End Of Every File
 
+At Begin Of File `sub.tex'
 At Begin Of Files
 Content of Sub File
 At End Of Files
+At End Of File `sub.tex'
 At End Of File `sub'
 At End Of Every File
 
+At Begin Of File `input.tex'
 At Begin Of Files
 Content of Input File
 At End Of Files
+At End Of File `input.tex'
 At End Of File `input'
 At End Of Inputs
+At End Of Input File `input.tex'
 At End Of Input File `input'
 At End Of Every File
 Main file after input file
