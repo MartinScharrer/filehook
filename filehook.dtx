@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1985 2011-01-03 07:09:17Z martin $
+%% $Id: filehook.dtx 1986 2011-01-03 10:43:11Z martin $
 % \fi
 %
 % \iffalse
@@ -1222,6 +1222,38 @@
 %
 % \iffalse
 %</memoir>
+%<*package>
+% \fi
+%
+% \iffalse
+%</package>
+%<*listings>
+% \fi
+%    \begin{macrocode}
+\ProvidesPackage{filehook-listings}[2011/01/02 v0.1 Patch for listings to avoid hooks for verbatim input files]
+\begingroup
+
+\long\def\patch#1\def\lst@next#2#3\endpatch{%
+    \toks@{#2}%
+    \edef\@tempa{\the\toks@}%
+    \def\@tempb{\input{####1}}%
+    \ifx\@tempa\@tempb
+        \gdef\lst@InputListing##1{#1\def\lst@next{\@input{##1}}#3}%
+    \else
+        \PackageWarning{filehook-listings}{To-be-patched code in macro \string\lst@InputListing was not found!}%
+    \fi
+}
+
+\@ifundefined{lst@InputListing}{%
+    \PackageWarning{filehook-listings}{To-be-patched Macro \string\lst@InputListing not found!}%
+}{}
+
+\expandafter\patch\lst@InputListing{#1}\endpatch
+
+\endgroup
+%    \end{macrocode}
+% \iffalse
+%</listings>
 %<*package>
 % \fi
 %

@@ -4,8 +4,9 @@
 \input docstrip.tex
 \keepsilent
 \generate{%
-    \file{filehook.sty}{\from{filehook.dtx}{package}}%
-    \file{filehook-scrlfile.sty}{\from{filehook.dtx}{scrlfile}}%
-    \file{filehook-memoir.sty}{\from{filehook.dtx}{memoir}}%
+    \file{filehook.sty}{\nopreamble\from{filehook.dtx}{package}}%
+    \file{filehook-scrlfile.sty}{\nopreamble\from{filehook.dtx}{scrlfile}}%
+    \file{filehook-memoir.sty}{\nopreamble\from{filehook.dtx}{memoir}}%
+    \file{filehook-listings.sty}{\nopreamble\from{filehook.dtx}{listings}}%
 }
 \endbatchfile
