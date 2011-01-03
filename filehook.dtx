@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1991 2011-01-03 15:33:33Z martin $
+%% $Id: filehook.dtx 1997 2011-01-03 17:58:04Z martin $
 % \fi
 %
 % \iffalse
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{870}
+% \CheckSum{934}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -1191,7 +1191,7 @@
                               The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
   \else
     \PackageError{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
-                            Use the 'force' option of 'filehook' to overwrite it.}%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
   \fi
 \fi
 %    \end{macrocode}
@@ -1346,7 +1346,7 @@
                               The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
   \else
     \PackageError{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
-                            Use the 'force' option of 'filehook' to overwrite it.}%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
   \fi
 \fi
 %    \end{macrocode}
@@ -1406,7 +1406,7 @@
                               The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
   \else
     \PackageError{filehook-fink}{Detected 'fink' package with unknown definition of \string\InputIfFileExists.^^J%
-                            Use the 'force' option of 'filehook' to overwrite it.}%
+                                 Use the 'force' option of 'filehook' to overwrite it.}{}%
   \fi
 \fi
 
@@ -1480,7 +1480,7 @@
     \fi
 \else
     \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
-                            Use the 'force' option of 'filehook' to overwrite it.}%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
 \fi
 %    \end{macrocode}
 % \end{macro}
