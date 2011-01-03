@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1990 2011-01-03 14:54:06Z martin $
+%% $Id: filehook.dtx 1991 2011-01-03 15:33:33Z martin $
 % \fi
 %
 % \iffalse
@@ -1146,30 +1146,6 @@
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\fink@new@InputIfFileExists}
-%    \begin{macrocode}
-\long\def\fink@new@InputIfFileExists#1#2{%
-  \IfFileExists{#1}{%
-    #2\@addtofilelist{#1}%
-    \edef\fink@before{\noexpand\fink@input{#1}}%
-    \edef\fink@after{\noexpand\fink@restore{\finkpath}}%
-    \expandafter\fink@before\fink@after}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\fink@old@InputIfFileExists}
-%    \begin{macrocode}
-\long\def\fink@old@InputIfFileExists#1#2{%
-  \IfFileExists{#1}{%
-    #2\@addtofilelist{#1}%
-    \fink@prepare{#1}%
-    \expandafter\fink@input%
-    \expandafter\fink@restore\expandafter{\finkpath}}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
 % \iffalse
 %</package>
 %<*memoir>
@@ -1379,14 +1355,69 @@
 \endgroup
 %    \end{macrocode}
 %
+%
 % \iffalse
 %</scrlfile>
-%<*package>
+%<*fink>
 % \fi
 %
 %    \begin{macrocode}
+\ProvidesPackage{filehook-fink}[2010/01/03 v0.1 filehook compatibility code for fink package]
+\RequirePackage{filehook}
+\RequirePackage[fink]{currfile}%
 
+\begingroup
+
+\long\def\fink@old@InputIfFileExists#1#2{%
+  \IfFileExists{#1}{%
+    #2\@addtofilelist{#1}%
+    \fink@prepare{#1}%
+    \expandafter\fink@input%
+    \expandafter\fink@restore\expandafter{\finkpath}}%
+}
+
+\long\def\fink@new@InputIfFileExists#1#2{%
+  \IfFileExists{#1}{%
+    #2\@addtofilelist{#1}%
+    \edef\fink@before{\noexpand\fink@input{#1}}%
+    \edef\fink@after{\noexpand\fink@restore{\finkpath}}%
+    \expandafter\fink@before\fink@after}%
+}
+
+\ifcase
+    \ifx\InputIfFileExists\filehook@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\latex@InputIfFileExists    1\else
+    \ifx\InputIfFileExists\fink@new@InputIfFileExists 1\else
+    \ifx\InputIfFileExists\fink@old@InputIfFileExists 1\else
+     1%
+    \fi\fi\fi\fi
+\relax
+\or
+  \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+  \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+  \global\let\InputIfFileExists\filehook@InputIfFileExists
+  \PackageInfo{filehook-fink}{Package 'fink' detected and replaced by 'currfile'}%
+\else
+  \iffilehook@force
+    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+    \global\let\InputIfFileExists\filehook@InputIfFileExists
+    \PackageWarning{filehook-fink}{Detected 'fink' package with unknown definition of \string\InputIfFileExists.^^J%
+                              The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
+  \else
+    \PackageError{filehook-fink}{Detected 'fink' package with unknown definition of \string\InputIfFileExists.^^J%
+                            Use the 'force' option of 'filehook' to overwrite it.}%
+  \fi
+\fi
+
+\endgroup
 %    \end{macrocode}
+%
+% \iffalse
+%</fink>
+%<*package>
+% \fi
+%
 %
 % \begin{macro}{\InputIfFileExists}
 % First we test for the |scrlfile| package. The test macro adds the necessary patches if so.
@@ -1410,7 +1441,7 @@
 \AtEndOfPackageFile*{fink}{%
    \PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}%
    \endgroup
-   \RequirePackage[fink]{currfile}%
+   \RequirePackage{filehook-fink}%
 }%
 %    \end{macrocode}
 % If |memoir| is detected its hooks
