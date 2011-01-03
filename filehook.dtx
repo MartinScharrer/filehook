@@ -1,5 +1,5 @@
 % \iffalse meta-comment
-%% Copyright (c) 2010 by Martin Scharrer <martin@scharrer-online.de>
+%% Copyright (c) 2010-2011 by Martin Scharrer <martin@scharrer-online.de>
 %% -----------------------------------------------------------------
 %%
 %% This work may be distributed and/or modified under the
@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2000 2011-01-03 18:53:42Z martin $
+%% $Id: filehook.dtx 2005 2011-01-03 22:53:56Z martin $
 % \fi
 %
 % \iffalse
@@ -29,12 +29,12 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2010/12/30 v0.4 Hooks for input files]
+    [2011/01/03 v0.4 Hooks for input files]
 %</package>
 %
 %<*driver>
-\documentclass{ydoc}[2010/12/20]
-\usepackage{filehook}[2010/12/30]
+\documentclass{ydoc}[2011/01/03]
+\usepackage{filehook}[2011/01/03]
 \usepackage{ifpdf}
 \usepackage{hyperref}
 \usepackage{array}
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{934}
+% \CheckSum{939}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -82,8 +82,18 @@
 % \changes{v0.1}{2010/04/08}{Initial version}
 % \changes{v0.2}{2010/12/08}{Added support for 'memoir' class and 'scrlfile' package. Remove support for deprecated 'fink' package.}
 % \changes{v0.3}{2010/12/20}{Added hooks for package and class files. Changed a warning to an error and added the 'force' option to overwrite this.}
-% \changes{v0.4}{2010/12/30}{Improved support for 'memoir' class and 'scrlfile' package. Added AtBeginOfEveryFile and AtEndOfEveryFile hooks.
+% \changes{v0.4}{2011/01/03}{^^A
+% Improved support for 'memoir' class and 'scrlfile' package.
+% Added AtBeginOfEveryFile and AtEndOfEveryFile hooks.
 % Changed handling of macro arguments in hook code.
+% Added filename parsing code to support TeX files with and without extension.
+% Added AtBeginOfEveryFile/AtEndOfEveryFile hooks.
+% Fixes misspelled \string\AfterOfIncludeFile.
+% Added patch for listings \lstinputlistings to avoid hooks for verbatim files.
+% Added star argument for AtBeginOfClass and PackageFile.
+% Worked on scrlfile and memoir compatibility.
+% Readded fink compatibility code.
+% Updated documentation.
 % }
 %
 % \GetFileInfo{filehook.dtx}
@@ -128,7 +138,7 @@
 % i.e. macros \Macro\documentclass, \Macro\LoadClassWithOptions and \Macro\LoadClass
 % as well as \Macro\usepackage, \Macro\RequirePackageWithOptions and \Macro\RequirePackage.
 % Note that \Macro\InputIfFileExists, and therefore its hooks, is used by the aforementioned macros.
-% In v0.4 from 2010/12/30 special hooks where added which are executed for every read file, but will not be
+% In v0.4 from 2011/03/01 special hooks where added which are executed for every read file, but will not be
 % executed a second time by the internal \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
 %
 % For all files a `AtBegin' and a `AtEnd' hook is installed. For \Macro\include files there is also a `After' hook which
@@ -145,7 +155,7 @@
 % The hooks for classes and packages are always specific to one file.
 %
 % Older versions of this package provided the file name as argument |#1| for the general hooks.
-% This has been changed in v0.4 from 2010/12/30: the hook code is stored and executed without modifications,
+% This has been changed in v0.4 from 2011/01/03: the hook code is stored and executed without modifications,
 % i.e.\ macro argument characters (|#|) are now handled like normal and don't have to be doubled.
 % See section~\ref{sec:upgrade} for information how to upgrade older documents.
 %
@@ -205,7 +215,7 @@
 % A workaround, e.g.\ done by older versions of the \pkg{currfile} package, is to execute the code twice for include files:
 % once in the |include| related hooks and once in the |OfFiles| hooks.
 %
-% A better solution for this problem was added in v0.4 from 2010/12/30:
+% A better solution for this problem was added in v0.4 from 2011/01/03:
 % the |EveryFile| hooks will be executed exactly once for every file, independent if it is
 % read using \Macro\input, \Macro\include or \Macro\InputIfFileExists.
 % Special care is taken to suppress them for the \Macro\InputIfFileExists inside \Macro\input and \Macro\include.
@@ -376,7 +386,7 @@
 % \subsubsection*{memoir}
 % The |memoir| class redefines \Macro\InputIfFileExists to add own hooks identical to the `At...OfFiles' hooks (there called \Macro\AtBeginFile and \Macro\AtEndFile).
 % This hooks will be moved to the corresponding ones of |filehook| and will keep working as normal.
-% Since v0.4 from 2010/12/30 this modification will be also applied when the |filehook| package is loaded (using \Macro\RequirePackage) \emph{before} the
+% Since v0.4 from 2011/01/03 this modification will be also applied when the |filehook| package is loaded (using \Macro\RequirePackage) \emph{before} the
 % |memoir| class. However, the hooks from |filehook| need to be temporally disabled while reading the |memoir| class.
 % They will not be triggered for all files read directly by this class, like configuration and patch files.
 % Note that the `At...OfClassFile' hooks still work for the |memoir| class file itself. In fact they are used to restore the default definition of \Macro\InputIfFileExists
@@ -389,13 +399,21 @@
 % \subsubsection*{scrlfile}
 % The |scrlfile| package from the \emph{koma-script} bundle redefines \Macro\InputIfFileExists to allow file name aliases and to also add hooks.
 % If required it should be loaded before |filehook|, which will add its hooks correctly to the modified definition.
-% Since v0.4 from 2010/12/30 this modification will be also applied when the |scrlfile| package is loaded after |filehook|.
+% Since v0.4 from 2011/01/03 this modification will be also applied when the |scrlfile| package is loaded after |filehook|.
 %
 %
 % \subsubsection*{fink}
 % The |filehook| and |currfile| packages where written as replacements for the |fink| package, where |filehook| provides the necessary hooks for |currfile|.
 % The |fink| package has now been deprecated in favour of |currfile| and should not be used anymore. The |fink| compatibility code has been removed from |filehook|
 % and both cannot be used successfully together as both redefine the \Macro\InputIfFileExists macro.
+%
+%
+% \subsubsection*{listings}
+% The \pkg{listings} package uses \Macro\input inside \Macro\lstinputlisting. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
+% Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
+% environment), any further code read using any input macro (\Macro\input, \Macro\@input, \Macro\@@input (\TeX's \Macro\input), \ldots) will be processed verbatim and typeset
+% as part of the listing. 
+% Since v0.4 this macro is automatically patched so \Macro\@input is used instead to avoid this issue.
 %
 %
 % \subsection{Other Classes and Packages}
@@ -406,14 +424,6 @@
 % This means that the hooks will not be active for this imported files because |filehook| is loaded after the class.
 % This should not affect its normal usage.
 % Note that, in theory, the package could be loaded before \Macro\documentclass using \Macro\RequirePackage to enable the file hooks also for these files.
-%
-% \subsubsection*{listings}
-% The \pkg{listings} package uses \Macro\input inside \Macro\lstinputlisting. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
-% Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
-% environment), any further code read using any input macro (\Macro\input, \Macro\@input, \Macro\@@input (\TeX's \Macro\input), \ldots) will be processed verbatim and typeset
-% as part of the listing. A known package suffering from this is \pkg{svn-multi} which loads |.svx| files for every |.tex| file.
-% A workaround for this issue is to temporally redefine \Macro\input to \Macro\@input for \Macro\lstinputlisting:\\
-% |   {\let\input\@input\lstinputlisting{...}}|.
 %
 % \subsubsection*{\LaTeX's \textbackslash bibliography}
 % The standard \LaTeX\ macro \Macro\bibliography uses the same internal macro \Macro\@input@ to read a file
@@ -445,13 +455,15 @@
 % \label{sec:upgrade}
 % This sections gives information for users of older versions of this package which unfortunately might not be 100\% backwards compatible.
 %
-% \subsection*{Upgrade to v0.4 - 2010/12/30}
+% \subsection*{Upgrade to v0.4 - 2011/01/03}
 % \begin{itemize}
 %   \item The macro \Macro\AfterIncludeFile was misspelled as \Macro\AfterOfIncludeFile in the implementation of earlier versions, but not in the documentation.
-%   This has now be corrected. Please adjust your code to use the correct name and to require the |filehook| package from 2010/12/30.
+%   This has now be corrected. Please adjust your code to use the correct name and to require the |filehook| package from 2011/01/03.
 %   \item All general hooks (the one not taking a file argument) used to have an implicit argument |#1| which was expanded to the file name (i.e.\ the argument of \Macro\input etc.).
-%    This has now be changed, so that macro arguments are not handled special in hook code. Older hooks which use this argument should either use \Macro\currfilebase\relax
-%    (identical to the old |#1|) or \Macro\currfilename\relax (parsed argument, always with file extension). These macros are available in \emph{all} hooks.
+%    This has now be changed, so that macro arguments are not handled special in hook code, which e.g.\ simplifies macro definitions.
+%    Older hook code might need to change |##| to |#| to compensate for this change.
+%    If the file name is required the macros (e.g.\ \Macro\currfilename) of the partner package \pkg{currfile} should be used.
+%    These macros are available everywhere including in all hocks.
 % \end{itemize}
 %
 % \StopEventually{}
@@ -1152,7 +1164,7 @@
 % \fi
 %
 %    \begin{macrocode}
-\ProvidesPackage{filehook-memoir}[2010/01/03 v0.1 filehook patch for memoir class]
+\ProvidesPackage{filehook-memoir}[2011/01/03 v0.1 filehook patch for memoir class]
 \RequirePackage{filehook}
 \begingroup
 %    \end{macrocode}
@@ -1234,7 +1246,7 @@
 % \fi
 %
 %    \begin{macrocode}
-\ProvidesPackage{filehook-scrlfile}[2010/01/03 v0.1 filehook patch for scrlfile package]
+\ProvidesPackage{filehook-scrlfile}[2011/01/03 v0.1 filehook patch for scrlfile package]
 \RequirePackage{filehook}
 \begingroup
 %    \end{macrocode}
@@ -1362,7 +1374,7 @@
 % \fi
 %
 %    \begin{macrocode}
-\ProvidesPackage{filehook-fink}[2010/01/03 v0.1 filehook compatibility code for fink package]
+\ProvidesPackage{filehook-fink}[2011/01/03 v0.1 filehook compatibility code for fink package]
 \RequirePackage{filehook}
 \RequirePackage{currfile}%
 
@@ -1439,8 +1451,8 @@
    \let\InputIfFileExists\latex@InputIfFileExists
 }%
 \AtEndOfPackageFile*{fink}{%
-   \PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}%
-   \endgroup
+   \edef\@tempa{\noexpand\PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}}%
+   \expandafter\endgroup\@tempa
    \RequirePackage{filehook-fink}%
 }%
 %    \end{macrocode}
