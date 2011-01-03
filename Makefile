@@ -26,8 +26,9 @@ clean:
 	latexmk -C ${PACKAGE}.dtx
 
 install: package doc
-	-@mkdir ${HOME}/texmf/tex/latex/currfile/ 2>/dev/null || true
-	cp ${PACKAGE}.sty ${HOME}/texmf/tex/latex/currfile/
-	cp ${PACKAGE}.pdf ${HOME}/texmf/tex/latex/currfile/
+	-@mkdir -p ${HOME}/texmf/tex/latex/filehook/ 2>/dev/null || true
+	-@mkdir -p ${HOME}/texmf/doc/latex/filehook/ 2>/dev/null || true
+	@cp -v ${PACKAGE}*.sty ${HOME}/texmf/tex/latex/filehook/
+	@cp -v ${PACKAGE}.pdf ${HOME}/texmf/doc/latex/filehook/
 	texhash ${HOME}/texmf
 
