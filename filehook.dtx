@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1988 2011-01-03 13:52:21Z martin $
+%% $Id: filehook.dtx 1990 2011-01-03 14:54:06Z martin $
 % \fi
 %
 % \iffalse
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{683}
+% \CheckSum{870}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -1254,13 +1254,6 @@
 %
 % \iffalse
 %</listings>
-%<*fink>
-% \fi
-%
-
-%
-% \iffalse
-%</fink>
 %<*scrlfile>
 % \fi
 %
@@ -1410,12 +1403,14 @@
 % Fink:
 %    \begin{macrocode}
 \AtBeginOfPackageFile*{fink}{%
+   \RequirePackage{kvoptions}%
    \begingroup
    \let\InputIfFileExists\latex@InputIfFileExists
 }%
 \AtEndOfPackageFile*{fink}{%
-   \RequirePackage[fink]{currfile}%
+   \PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}%
    \endgroup
+   \RequirePackage[fink]{currfile}%
 }%
 %    \end{macrocode}
 % If |memoir| is detected its hooks
