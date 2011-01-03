@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1987 2011-01-03 13:46:56Z martin $
+%% $Id: filehook.dtx 1988 2011-01-03 13:52:21Z martin $
 % \fi
 %
 % \iffalse
@@ -309,7 +309,7 @@
 %
 % \subsection*{Package Files}
 %
-% \DescribeMacro{\AtBeginOfPackageFile}{<package name>}{<\TeX\ code>}
+% \DescribeMacro{\AtBeginOfPackageFile}*{<package name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfPackageFile}*{<package name>}{<\TeX\ code>}
 % This macros install the given \MacroArgs<\TeX\ code> in the `AtBegin' and `AtEnd' hooks of the given package file.
 % The \Macro\AtBeginOfPackageFile simply executes \Macro\AtBeginOfFile{<package name>.sty}{<\TeX code>}.
@@ -332,7 +332,7 @@
 %
 % \subsection*{Class Files}
 %
-% \DescribeMacro{\AtBeginOfClassFile}{<class name>}{<\TeX\ code>}
+% \DescribeMacro{\AtBeginOfClassFile}*{<class name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfClassFile}*{<class name>}{<\TeX\ code>}
 % This macros install the given \MacroArgs<\TeX\ code> in the `AtBegin' and `AtEnd' hooks of the given class file.
 % They work with classes loaded using \Macro\LoadClass, \Macro\LoadClassWithOptions and also \Macro\documentclass.
@@ -383,7 +383,7 @@
 % at the begin and patch it at the end of the class file.
 % The |filehook| package should be loaded either before the class (using \Macro\RequirePackage) or directly
 % after it. Because the |memoir| hook code is moved to the |filehook| hooks this class should then be
-% compatible with below packages if |filehook| is loaded before them.
+% compatible with below packages if |memoir| and |filehook| are loaded before them.
 %
 %
 % \subsubsection*{scrlfile}
