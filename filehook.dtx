@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 1986 2011-01-03 10:43:11Z martin $
+%% $Id: filehook.dtx 1987 2011-01-03 13:46:56Z martin $
 % \fi
 %
 % \iffalse
@@ -827,94 +827,93 @@
 % \end{macro}
 %
 %
-% \begin{macro}{\AtBeginOfPackageFile}[1]{package name}
-% Simply add the package extension and calls the general macro.
+%
+% \begin{macro}{\AtBeginOfClassFile}
 %    \begin{macrocode}
-\newcommand*\AtBeginOfPackageFile[1]{%
-    \AtBeginOfFile{#1.\@pkgextension}%
+\newcommand*\AtBeginOfClassFile{%
+    \@ifnextchar*
+        {\AtBeginOfXFile@star\@clsextension}%
+        {\AtBeginOfXFile@normal\@clsextension}%
 }
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\AtBeginOfPackageFile}
+%    \begin{macrocode}
+\newcommand*\AtBeginOfPackageFile{%
+    \@ifnextchar*
+        {\AtBeginOfXFile@star\@pkgextension}%
+        {\AtBeginOfXFile@normal\@pkgextension}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\AtBeginOfXFile@star}[2]{extension}{name}
+% If the class or package is already loaded the code is executed right away.
+% Otherwise it is installed normally.
+%    \begin{macrocode}
+\def\AtBeginOfXFile@star#1*#2{%
+    \@ifl@aded{#1}{#2}%
+        {\@firstofone}%
+        {\AtBeginOfXFile@normal{#1}{#2}}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\AtBeginOfXFile@normal}[2]{extension}{name}
+%    \begin{macrocode}
+\def\AtBeginOfXFile@normal#1#2{%
+    \AtBeginOfFile{#2.#1}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\AtEndOfClassFile}
+%    \begin{macrocode}
+\newcommand*\AtEndOfClassFile{%
+    \@ifnextchar*
+        {\AtEndOfXFile@star\@clsextension}%
+        {\AtEndOfXFile@normal\@clsextension}%
+}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\AtEndOfPackageFile}
 %    \begin{macrocode}
 \newcommand*\AtEndOfPackageFile{%
-    \@ifnextchar*\AtEndOfPackageFile@star\AtEndOfPackageFile@normal
+    \@ifnextchar*
+        {\AtEndOfXFile@star\@pkgextension}%
+        {\AtEndOfXFile@normal\@pkgextension}%
 }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\AtEndOfPackageFile@star}[2]{package name}{code}
-% If the package is already loaded the code is executed right away.
+%
+% \begin{macro}{\AtEndOfXFile@star}[2]{extension}{name}
+% If the class or package is already loaded the code is executed right away.
 % Otherwise it is installed normally.
 %    \begin{macrocode}
-\def\AtEndOfPackageFile@star*#1#2{%
-    \@ifpackageloaded{#1}%
-        {#2}%
-        {\AtEndOfPackageFile@normal{#1}{#2}}%
+\def\AtEndOfXFile@star#1*#2{%
+    \@ifl@aded{#1}{#2}%
+        {\@firstofone}%
+        {\AtEndOfXFile@normal{#1}{#2}}%
 }
 %    \end{macrocode}
 % \end{macro}
 %
-% \begin{macro}{\AtEndOfPackageFile@normal}[2]{package name}{code}
-% Installs the code at the end of the package file inside a \Macro\AtEndOfPackage
-% command to ensure it is executed after any \Macro\AtEndOfPackage code installed
-% by the package itself.
-%
-% Note if the package was already loaded or is not loaded at all the installed
-% code is never executed.
+% \begin{macro}{\AtEndOfXFile@normal}[2]{extension}{name}
+% Note that \Macro\AtEndOfClass is identical to \Macro\AtEndOfPackage, so no
+% differenciation between classes and packages is needed here.
 %    \begin{macrocode}
-\def\AtEndOfPackageFile@normal#1#2{%
-    \AtEndOfFile{#1.\@pkgextension}{\AtEndOfPackage{#2}}%
+\def\AtEndOfXFile@normal#1#2#3{%
+    \AtEndOfFile{#2.#1}{\AtEndOfPackage{#3}}%
 }
 %    \end{macrocode}
 % \end{macro}
 %
 %
-% \begin{macro}{\AtBeginOfClassFile}[1]{class name}
-% Simply add the class extension and calls the general macro.
-%    \begin{macrocode}
-\newcommand*\AtBeginOfClassFile[1]{%
-    \AtBeginOfFile{#1.\@clsextension}%
-}
-%    \end{macrocode}
-% \end{macro}
 %
-%
-% \begin{macro}{\AtEndOfClassFile}[2]{class name}{code}
-%    \begin{macrocode}
-\newcommand*\AtEndOfClassFile{%
-    \@ifnextchar*\AtEndOfClassFile@star\AtEndOfClassFile@normal
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\AtEndOfClassFile@star}[2]{class name}{code}
-% If the class is already loaded the code is executed right away.
-% Otherwise it is installed normally.
-%    \begin{macrocode}
-\def\AtEndOfClassFile@star*#1#2{%
-    \@ifclassloaded{#1}%
-        {#2}%
-        {\AtEndOfClassFile@normal{#1}{#2}}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\AtEndOfClassFile@normal}[2]{class name}{code}
-% Installs the code at the end of the class file inside a \Macro\AtEndOfClass
-% command to ensure it is executed after any \Macro\AtEndOfClass code installed
-% by the class itself.
-%
-% Note if the class was already loaded or is not loaded at all the installed
-% code is never executed.
-%    \begin{macrocode}
-\def\AtEndOfClassFile@normal#1#2{%
-    \AtEndOfFile{#1.\@clsextension}{\AtEndOfClass{#2}}%
-}
-%    \end{macrocode}
-% \end{macro}
 %
 % \subsection{Installation of Hooks}
 % The \Macro\@input@ and \Macro\@iinput macros from |latex.ltx| are redefined to install the hooks.
@@ -1195,7 +1194,12 @@
 % \end{macro}
 %
 %    \begin{macrocode}
-\ifx\InputIfFileExists\memoir@InputIfFileExists
+\ifcase
+    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\memoir@InputIfFileExists 0\else
+     1%
+    \fi\fi
+\relax
   \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
   \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
   \global\let\InputIfFileExists\filehook@InputIfFileExists
@@ -1222,11 +1226,6 @@
 %
 % \iffalse
 %</memoir>
-%<*package>
-% \fi
-%
-% \iffalse
-%</package>
 %<*listings>
 % \fi
 %    \begin{macrocode}
@@ -1252,13 +1251,16 @@
 
 \endgroup
 %    \end{macrocode}
-% \iffalse
-%</listings>
-%<*package>
-% \fi
 %
 % \iffalse
-%</package>
+%</listings>
+%<*fink>
+% \fi
+%
+
+%
+% \iffalse
+%</fink>
 %<*scrlfile>
 % \fi
 %
@@ -1356,7 +1358,12 @@
 % not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
 % Note that this will stop working if |scrlfile| ever changes its definition of the \Macro\InputIfFileExists macro.
 %    \begin{macrocode}
-\ifx\InputIfFileExists\scrlfile@InputIfFileExists
+\ifcase
+    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\scrlfile@InputIfFileExists 0\else
+     1%
+    \fi\fi
+\relax
   \global\let\filehook@InputIfFileExists\filehook@scrlfile@InputIfFileExists
   \global\let\filehook@@InputIfFileExists\filehook@@scrlfile@InputIfFileExists
   \global\let\InputIfFileExists\filehook@InputIfFileExists
@@ -1393,11 +1400,22 @@
 % In order to also support it when it is loaded afterwards the two hooks below are used to revert the definition
 % before the package and patch it afterwards.
 %    \begin{macrocode}
-\AtBeginOfPackageFile{scrlfile}{%
+\AtBeginOfPackageFile*{scrlfile}{%
    \let\InputIfFileExists\latex@InputIfFileExists
 }%
 \AtEndOfPackageFile*{scrlfile}{%
    \RequirePackage{filehook-scrlfile}%
+}%
+%    \end{macrocode}
+% Fink:
+%    \begin{macrocode}
+\AtBeginOfPackageFile*{fink}{%
+   \begingroup
+   \let\InputIfFileExists\latex@InputIfFileExists
+}%
+\AtEndOfPackageFile*{fink}{%
+   \RequirePackage[fink]{currfile}%
+   \endgroup
 }%
 %    \end{macrocode}
 % If |memoir| is detected its hooks
@@ -1405,7 +1423,7 @@
 % exact same position. Please note that the case when |memoir| is used together with |scrlfile| is not explicitly covered.
 % In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
-\AtBeginOfClassFile{memoir}{%
+\AtBeginOfClassFile*{memoir}{%
   \let\filehook@@InputIfFileExists\latex@InputIfFileExists
   \let\InputIfFileExists\latex@InputIfFileExists
   \let\@iinput\filehook@orig@@iinput
