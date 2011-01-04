@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2005 2011-01-03 22:53:56Z martin $
+%% $Id: filehook.dtx 2012 2011-01-04 16:50:08Z martin $
 % \fi
 %
 % \iffalse
@@ -324,7 +324,7 @@
 % This macros install the given \MacroArgs<\TeX\ code> in the `AtBegin' and `AtEnd' hooks of the given package file.
 % The \Macro\AtBeginOfPackageFile simply executes \Macro\AtBeginOfFile{<package name>.sty}{<\TeX code>}.
 % Special care is taken to ensure that the `AtEnd' code is executed \emph{after} any code installed by the package itself
-% using the \LaTeX\ macro \Macro\AtEndOfPackage.
+% using the \LaTeX\ macro \Macro\AtEndOfPackage. Note that it is therefore executed after the `AtEndOfEveryFile' hook.
 % If the starred version is used and the package is already loaded the code
 % is executed right away.
 %
@@ -350,6 +350,7 @@
 % The macro \Macro\AtBeginOfClassFile simply executes \Macro\AtBeginOfFile{<class name>.cls}{\ldots}.
 % Special care is taken to ensure that the `AtEnd' code is executed \emph{after} any code installed by the class itself
 % using the \LaTeX\ macro \Macro\AtEndOfClass.
+% Note that it is therefore executed after the `AtEndOfEveryFile' hook.
 % If the starred version is used and the class is already loaded the code
 % is executed right away.
 %
