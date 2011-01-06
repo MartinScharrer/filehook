@@ -1,0 +1,52 @@
+%&pdflatex
+\RequirePackage{filehooktest}
+\RequirePackage{pgf-filehook}
+
+\pgffilehook{%
+    ClassFile/AtBegin={testclass}{\testmessage{At Begin Of Class File `testclass'}},
+    ClassFile/AtBegin=*{testclass}{\testmessage{At Begin Of Class File `testclass' (star)}},
+    ClassFile/AtEnd={testclass}{\testmessage{At End Of Class File `testclass'}},
+    ClassFile/AtEnd=*{testclass}{\testmessage{At End Of Class File `testclass' (star)}},
+    Files/AtBegin={\testmessage{At Begin Of Files}},
+    Files/AtEnd={\testmessage{At End Of Files}},
+    File/AtBegin={testclass.cls}{\testmessage{At Begin Of File `testclass.cls'}},
+    File/AtEnd={testclass.cls}{\testmessage{At End Of File `testclass.cls'}},
+    EveryFile/AtBegin={\testmessage{At Begin Of Every File}},
+    EveryFile/AtEnd={\testmessage{At End Of Every File}},
+}
+
+\test{class}
+
+\documentclass{testclass}
+\testmessage{}
+
+\pgffilehook{%
+    ClassFile,
+    AtBegin={testclass}{\testmessage{SHOULD NOT BE SHOWN: At Begin Of Class File `testclass' (after class)}},
+    AtBegin=*{testclass}{\testmessage{At Begin Of Class File `testclass' (star) (after class)}},
+    AtEnd={testclass}{\testmessage{SHOULD NOT BE SHOWN: At End Of Class File `testclass' (after class)}},
+    AtEnd=*{testclass}{\testmessage{At End Of Class File `testclass' (star) (after class)}},
+}
+
+\begin{document}
+
+\reference{%
+At Begin Of Every File
+At Begin Of Class File `testclass'
+At Begin Of Class File `testclass' (star)
+At Begin Of File `testclass.cls'
+At Begin Of Files
+Content of test class
+At End Of Files
+At End Of File `testclass.cls'
+At End Of Every File
+AtEndOfClass hook of test class
+At End Of Class File `testclass' (star)
+At End Of Class File `testclass'
+
+At Begin Of Class File `testclass' (star) (after class)
+At End Of Class File `testclass' (star) (after class)
+}%
+\endtest
+\end{document}
+
