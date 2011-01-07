@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2014 2011-01-06 22:41:12Z martin $
+%% $Id: filehook.dtx 2015 2011-01-07 00:54:20Z martin $
 % \fi
 %
 % \iffalse
@@ -29,7 +29,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2011/01/03 v0.4 Hooks for input files]
+    [2011/01/07 v0.5 Hooks for input files]
 %</package>
 %
 %<*driver>
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{939}
+% \CheckSum{966}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -95,6 +95,7 @@
 % Readded fink compatibility code.
 % Updated documentation.
 % }
+% \changes{v0.5}{2011/01/07}{Added PGF key interface for hooks.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -366,6 +367,41 @@
 %   }}}%
 % }}}
 %
+% \clearpage
+% \section{PGF Key Interface}
+% An auxiliary package |pgf-filehook| is provided which adds support for the versatile \pkg{pgfkeys} interface.
+% This interface is heavily used by \pkg{pgf} (portable graphics format) and its higher level format Ti\textit{k}Z.
+% It allows the definition and execution of styles and commands (macros) using a \MacroArgs<key>'='<value> format.
+% Main benefits over similar formats is the support for a ``directory structure'' inside the key and the ability
+% to call functions on the value before it gets processed by the key. The main way to define and execute keys 
+% is the macro \Macro\pgfkeys{<key>'='<value>',...'}. Ti\textit{k}Z provides the similar macro \Macro\tikzstyle
+% which defaults to the main path `|/tikz|'.
+% More detailed information can be found in the official |pgfmanual|.
+%
+% All |filehook| macros described in the previous section (\Macro{AtXXXOfYYY}) can also be accessed using the 
+% pgf keys directory `|/filehook|', where all hook type have an own sub-directory (|/filehook/YYY|) in which
+% the hooks for this type are located (|/filehook/YYY/AtXXX|).
+% For example {\Macro\AtBeginOfInputs{<code>}} can also be 
+% accessed using \\\hspace*{\parindent}\Macro\pgfkeys{'/filehook/Inputs/AtBegin='{<code>}}\\ or \Macro\AfterIncludeFile{<file name>}{<code>} as
+% \\\hspace*{\parindent}{\Macro\pgfkeys{'/filehook/IncludeFile/After='{<file name>}{<code>}}}\\ as well as
+% \Macro\AtEndOfClassFile*{<file name>}{<code>} as 
+% \\\hspace*{\parindent}{\Macro\pgfkeys{'/filehook/ClassFile/AtEnd='*{<file name>}{<code>}}.}
+%
+% \DescribeMacro\pgffilehook{<key>'='<value>',...'}
+% This macro is like \Macro\pgfkeys but defaults to the `|/filehook|' directory, so that it can be dropped from the 
+% \marg{key}. Note that |pgfkeys| also supports to ``change the directory'' using \MacroArgs<directory>'/.cd', so that
+% it does not need to be included in further keys. All directories are defined as `\textit{is family}' so the |/.cd| is
+% assumed if the directory is used on its own.
+% For example\\\centerline{\Macro\pgfkeys{'/filehook/Inputs/AtBegin='{<code>}',/filehook/Inputs/AtEnd='{<code>}}}
+% can be shorten as\\\centerline{\Macro\pgffilehook{'Inputs,AtBegin='{<code>}',AtEnd='{<code>}}.}
+%
+% \bigskip
+% Some of the pgf key functions can become useful, e.g.\ if the hook code should be expanded before it is added to the hook:\\
+% \hspace*{\parindent}\Macro\pgffilehook{'EveryFile/AtBegin/.expand once='{\AlsoMacro\headertext\space\AlsoMacro\currfilename}}\\
+% will expand the first macro \Macro\headertext\relax (actually the first token) in the hook code once (using \Macro\expandafter), but
+% not any other tokens. In this example future changes of \Macro\headertext would not have any effect on the hook code, but 
+% \Macro\currfilename will be expanded for every file.
+% Other useful functions are `|.expand twice|' (expand the first token twice) and `|.expanded|' (expand the whole hook code using \Macro\edef).
 %
 % \clearpage
 % \section{Compatibility Issues with Classes and other Packages}
@@ -1522,53 +1558,6 @@
 \pgfkeys{%
     /filehook/.is family,
     /filehook,
-%
-    AtBeginOfEveryFile/.code={\AtBeginOfEveryFile{#1}},
-    AtBeginOfEveryFile/.value required,
-    AtEndOfEveryFile/.code={\AtEndOfEveryFile{#1}},
-    AtEndOfEveryFile/.value required,
-%
-    AtBeginOfFiles/.code={\AtBeginOfFiles{#1}},
-    AtBeginOfFiles/.value required,
-    AtEndOfFiles/.code={\AtEndOfFiles{#1}},
-    AtEndOfFiles/.value required,
-    AtBeginOfFile/.code 2 args={\AtBeginOfFile{#1}{#2}},
-    AtBeginOfFile/.value required,
-    AtEndOfFile/.code 2 args={\AtEndOfFile{#1}{#2}},
-    AtEndOfFile/.value required,
-%
-    AtBeginOfInputs/.code={\AtBeginOfInputs{#1}},
-    AtBeginOfInputs/.value required,
-    AtEndOfInputs/.code={\AtEndOfInputs{#1}},
-    AtEndOfInputs/.value required,
-    AtBeginOfInputFile/.code 2 args={\AtBeginOfInputFile{#1}{#2}},
-    AtBeginOfInputFile/.value required,
-    AtEndOfInputFile/.code 2 args={\AtEndOfInputFile{#1}{#2}},
-    AtEndOfInputFile/.value required,
-%
-    AtBeginOfIncludes/.code={\AtBeginOfIncludes{#1}},
-    AtBeginOfIncludes/.value required,
-    AtEndOfIncludes/.code={\AtEndOfIncludes{#1}},
-    AtEndOfIncludes/.value required,
-    AfterIncludes/.code={\AfterIncludes{#1}},
-    AfterIncludes/.value required,
-%
-    AtBeginOfIncludeFile/.code 2 args={\AtBeginOfIncludeFile{#1}{#2}},
-    AtBeginOfIncludeFile/.value required,
-    AtEndOfIncludeFile/.code 2 args={\AtEndOfIncludeFile{#1}{#2}},
-    AtEndOfIncludeFile/.value required,
-    AfterIncludeFile/.code 2 args={\AfterIncludeFile{#1}{#2}},
-    AfterIncludeFile/.value required,
-%
-    AtBeginOfClassFile/.code={\AtBeginOfClassFile#1},
-    AtBeginOfClassFile/.value required,
-    AtEndOfClassFile/.code={\AtEndOfClassFile#1},
-    AtEndOfClassFile/.value required,
-%
-    AtBeginOfPackageFile/.code={\AtBeginOfPackageFile#1},
-    AtBeginOfPackageFile/.value required,
-    AtEndOfPackageFile/.code={\AtEndOfPackageFile#1},
-    AtEndOfPackageFile/.value required,
 %
     EveryFile/.is family,
     EveryFile/AtBegin/.code={\AtBeginOfEveryFile{#1}},
