@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2016 2011-01-07 00:56:27Z martin $
+%% $Id: filehook.dtx 2017 2011-01-07 09:46:12Z martin $
 % \fi
 %
 % \iffalse
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{966}
+% \CheckSum{976}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -367,6 +367,21 @@
 %   }}}%
 % }}}
 %
+% \subsection{Clearing Hooks}
+% \DescribeMacro\ClearHook\AlsoMacro{At...Of...}<argument(s) of hook macro>
+% Using\marginpar{New in v0.5 2011/01/07} this macro existing hooks can be globally cleared, i.e.\ set to empty.
+% This should be used with care because it will also remove all (user level) hook code set
+% by packages into this hook.
+% Note that the special hook code installed by the packages \pkg{currfile} and \pkg{svn-multi}
+% as well as the compatibility code described in section~\ref{sec:comp} is not affected.
+% The syntax for this macro is the same as for the normal hook macros only with a leading \Macro\ClearHook,
+% where the \meta{code} argument is mandatory but its content is ignored.
+% Examples:\\
+% \hspace*{\bigskipamount}\Macro\ClearHook\AlsoMacro\AtBeginOfInputFile{<file name>}{<ignored>}\\
+% \hspace*{\bigskipamount}\Macro\ClearHook\AlsoMacro\AtBeginOfFiles{<ignored>}
+%
+%
+%
 % \clearpage
 % \section{PGF Key Interface}
 % An auxiliary package |pgf-filehook| is provided which adds support for the versatile \pkg{pgfkeys} interface.
@@ -404,7 +419,7 @@
 % Other useful functions are `|.expand twice|' (expand the first token twice) and `|.expanded|' (expand the whole hook code using \Macro\edef).
 %
 % \clearpage
-% \section{Compatibility Issues with Classes and other Packages}
+% \section{Compatibility Issues with Classes and other Packages}\label{sec:comp}
 % The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists
 % or internal macros used by \Macro\include and \Macro\input (which are \Macro\@input@ and \Macro\@iinput).
 % Special compatibility code is in place for the packages listed below (in their current implementation).
@@ -957,6 +972,21 @@
 %    \begin{macrocode}
 \def\AtEndOfXFile@normal#1#2#3{%
     \AtEndOfFile{#2.#1}{\AtEndOfPackage{#3}}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\ClearHook}
+% Clears the hook by temporary redefining the prefix and append macros
+% to do a simple definition to empty.
+%    \begin{macrocode}
+\newcommand*\ClearHook{%
+    \begingroup
+    \def\filehook@prefix##1##2{%
+        \gdef##1{}%
+        \endgroup
+    }%
+    \let\filehook@append\filehook@prefix
 }
 %    \end{macrocode}
 % \end{macro}
