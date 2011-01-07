@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2015 2011-01-07 00:54:20Z martin $
+%% $Id: filehook.dtx 2016 2011-01-07 00:56:27Z martin $
 % \fi
 %
 % \iffalse
@@ -389,13 +389,13 @@
 %
 % \DescribeMacro\pgffilehook{<key>'='<value>',...'}
 % This macro is like \Macro\pgfkeys but defaults to the `|/filehook|' directory, so that it can be dropped from the 
-% \marg{key}. Note that |pgfkeys| also supports to ``change the directory'' using \MacroArgs<directory>'/.cd', so that
-% it does not need to be included in further keys. All directories are defined as `\textit{is family}' so the |/.cd| is
+% \meta{key}. Note that |pgfkeys| also supports to ``change the directory'' using \MacroArgs<directory>'/.cd', so that
+% it does not need to be included in further keys. All directories are defined as `\textit{is family}' so that the |/.cd| is
 % assumed if the directory is used on its own.
 % For example\\\centerline{\Macro\pgfkeys{'/filehook/Inputs/AtBegin='{<code>}',/filehook/Inputs/AtEnd='{<code>}}}
 % can be shorten as\\\centerline{\Macro\pgffilehook{'Inputs,AtBegin='{<code>}',AtEnd='{<code>}}.}
 %
-% \bigskip
+% \medskip
 % Some of the pgf key functions can become useful, e.g.\ if the hook code should be expanded before it is added to the hook:\\
 % \hspace*{\parindent}\Macro\pgffilehook{'EveryFile/AtBegin/.expand once='{\AlsoMacro\headertext\space\AlsoMacro\currfilename}}\\
 % will expand the first macro \Macro\headertext\relax (actually the first token) in the hook code once (using \Macro\expandafter), but
