@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2017 2011-01-07 09:46:12Z martin $
+%% $Id: filehook.dtx 2024 2011-01-08 10:45:15Z martin $
 % \fi
 %
 % \iffalse
@@ -131,7 +131,7 @@
 % These package changes some internal \LaTeX{} macros used to load input files so that they include `hooks'.
 % A hook is an (internal) macro executed at specific points. Normally it is initially empty, but can be extended using
 % an user level macro. The most common hook in \LaTeX{} is the `At-Begin-Document' hook. Code can be added to this hook
-% using \Macro\AtBeginDocument{<\TeX code>}.
+% using \Macro\AtBeginDocument{<\TeX\ code>}.
 %
 %
 % This package provides hooks for files read by the \LaTeX{} macros \Macro\input, \Macro\include and 
@@ -225,8 +225,8 @@
 % For \Macro\input files the `Begin' hook is executed before the \Macro\AtBeginOfInputs hook and the `End' hook after
 % the \Macro\AtEndOfInputs.
 % Similarly, for \Macro\include files the `Begin' hook is executed before the \Macro\AtBeginOfIncludes hook and the `End' hook after
-% the \Macro\AfterIncludes (!).
-% For files read by \Macro\InputIfFileExists (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
+% the \Macro\AfterIncludes\relax (!).
+% For files read by \Macro\InputIfFileExists\relax (e.g. also for \Macro\usepackage, etc.) they are executed before and after the
 % \Macro\AtBeginOfFiles and \Macro\AtEndOfFiles hooks, respectively.
 % Note that the \Macro\AtBeginOfEveryFile hook is executed before the \Macro\AtBeginOfPackageFile/\Macro\AtBeginOfClassFile hooks
 % and that the \Macro\AtEndOfEveryFile hook is executed also before the hooks \Macro\AtEndOfPackageFile/\Macro\AtEndOfClassFile.
@@ -239,7 +239,7 @@
 % \DescribeMacro{\AtEndOfFiles}{<\TeX\ code>}
 % These macros add the given \marg{code} to two hooks executed for all files read using the \Macro\InputIfFileExists macro. This macro is used internally by the 
 % \Macro\input, \Macro\include and \Macro\usepackage/\Macro\RequirePackage macros. Packages and classes might use it to include additional or auxiliary files.
-% Authors can exclude those files from the hooks by using \Macro\IfFileExists{<file name>}|{\@input\@filef@und}{}| instead.
+% Authors can exclude those files from the hooks by using the following code instead:\\\hspace*{\bigskipamount}\Macro\IfFileExists{<file name>}|{\@input\@filef@und}{}|
 %
 % \DescribeMacro{\AtBeginOfFile}{<file name with extension>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFile}{<file name with extension>}{<\TeX\ code>}
@@ -421,7 +421,7 @@
 % \clearpage
 % \section{Compatibility Issues with Classes and other Packages}\label{sec:comp}
 % The |filehook| package might clash with other packages or classes which also redefine \Macro\InputIfFileExists
-% or internal macros used by \Macro\include and \Macro\input (which are \Macro\@input@ and \Macro\@iinput).
+% or internal macros used by \Macro\include and \Macro\input\relax (which are \Macro\@input@ and \Macro\@iinput).
 % Special compatibility code is in place for the packages listed below (in their current implementation).
 % If any other unknown definition of \Macro\InputIfFileExists is found an error will be raised.
 % The package option `|force|' can be used to prevent this and to force the redefinition of this macro.
@@ -463,7 +463,7 @@
 % \subsubsection*{listings}
 % The \pkg{listings} package uses \Macro\input inside \Macro\lstinputlisting. Therefore the |InputFile|(|s|) and |File|(|s|) hooks are also triggered for these files.
 % Please note that this hooks are executing inside a verbatim environment. While the code in the hook is not affected (because it was added outside the verbatim
-% environment), any further code read using any input macro (\Macro\input, \Macro\@input, \Macro\@@input (\TeX's \Macro\input), \ldots) will be processed verbatim and typeset
+% environment), any further code read using any input macro (\Macro\input, \Macro\@input, \Macro\@@input\relax (\TeX's \Macro\input), \ldots) will be processed verbatim and typeset
 % as part of the listing. 
 % Since v0.4 this macro is automatically patched so \Macro\@input is used instead to avoid this issue.
 %
@@ -502,7 +502,6 @@
 %    \end{tabular}
 % \end{table}
 %
-% \clearpage
 % \section{Upgrade Guide}
 % \label{sec:upgrade}
 % This sections gives information for users of older versions of this package which unfortunately might not be 100\% backwards compatible.
