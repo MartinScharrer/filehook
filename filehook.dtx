@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2024 2011-01-08 10:45:15Z martin $
+%% $Id: filehook.dtx 2025 2011-01-08 11:00:16Z martin $
 % \fi
 %
 % \iffalse
@@ -95,7 +95,7 @@
 % Readded fink compatibility code.
 % Updated documentation.
 % }
-% \changes{v0.5}{2011/01/07}{Added PGF key interface for hooks.}
+% \changes{v0.5}{2011/01/07}{Added PGF key interface for hooks. Added macro to clear hooks.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -241,10 +241,10 @@
 % \Macro\input, \Macro\include and \Macro\usepackage/\Macro\RequirePackage macros. Packages and classes might use it to include additional or auxiliary files.
 % Authors can exclude those files from the hooks by using the following code instead:\\\hspace*{\bigskipamount}\Macro\IfFileExists{<file name>}|{\@input\@filef@und}{}|
 %
-% \DescribeMacro{\AtBeginOfFile}{<file name with extension>}{<\TeX\ code>}
-% \DescribeMacro{\AtEndOfFile}{<file name with extension>}{<\TeX\ code>}
-% Like the {\Macro{...OfIncludeFile}{<file name>}{<\TeX\ code>}} macros above, just for `all' read files. Here the \meta{file name} should include the file
-% extension!
+% \DescribeMacro{\AtBeginOfFile}{<file name>}{<\TeX\ code>}
+% \DescribeMacro{\AtEndOfFile}{<file name>}{<\TeX\ code>}
+% Like the {\Macro{...OfIncludeFile}{<file name>}{<\TeX\ code>}} macros above, just for `all' read files.
+% If the \meta{file name} does not include a file extension it will be set to `|.tex|'.
 %
 % The `all files' hooks are closer to the file content than the \Macro\input and \Macro\include hook, i.e.\ the \Macro\AtBeginOfFiles comes \emph{after} the \Macro\AtBeginOfIncludes and
 % the \Macro\AtEndOfFiles comes \emph{before} the \Macro\AtEndOfIncludes hook.
@@ -267,6 +267,7 @@
 % These file-specific macros take the two arguments. The \meta{code} is only executed for the file with the given \meta{file name}
 % and only if it is read using \Macro\include.
 % The \meta{file name} should be identical to the name used for \Macro\include and not include the `|.tex|' extension.
+% Files with a different extension are neither supported by \Macro\include nor this hooks.
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
 % \centerline{\hbox{\vbox{%
@@ -297,8 +298,8 @@
 %
 % \DescribeMacro{\AtBeginOfInputFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfInputFile}{<file name>}{<\TeX\ code>}
-% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro\input. Here the \meta{file name} should include the file
-% extension!
+% Like the \Macro{...OfIncludeFile}{<file name>}{code} macros above, just for file read using \Macro\input.
+% If the \meta{file name} does not include a file extension it will be set to `|.tex|'.
 %
 % The following figure shows the positions of the hooks inside the macro:\par\medskip
 % \centerline{\hbox{\vbox{%
@@ -1580,7 +1581,7 @@
 % \subsection{Support for PGF Keys}
 %
 %    \begin{macrocode}
-\ProvidesPackage{pgf-filehook}[2010/01/06 v1.0 PGF keys for the filehook package]
+\ProvidesPackage{pgf-filehook}[2010/01/07 v1.0 PGF keys for the filehook package]
 \RequirePackage{filehook}
 \RequirePackage{pgfkeys}
 
