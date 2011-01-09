@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2025 2011-01-08 11:00:16Z martin $
+%% $Id: filehook.dtx 2033 2011-01-09 17:14:37Z martin $
 % \fi
 %
 % \iffalse
@@ -29,12 +29,12 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2011/01/07 v0.5 Hooks for input files]
+    [2011/01/09 v0.5 Hooks for input files]
 %</package>
 %
 %<*driver>
-\documentclass{ydoc}[2011/01/03]
-\usepackage{filehook}[2011/01/03]
+\documentclass{ydoc}[2011/01/09]
+\usepackage{filehook}[2011/01/09]
 \usepackage{ifpdf}
 \usepackage{hyperref}
 \usepackage{array}
@@ -95,7 +95,7 @@
 % Readded fink compatibility code.
 % Updated documentation.
 % }
-% \changes{v0.5}{2011/01/07}{Added PGF key interface for hooks. Added macro to clear hooks.}
+% \changes{v0.5}{2011/01/09}{Added PGF key interface for hooks. Added macro to clear hooks.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -370,7 +370,7 @@
 %
 % \subsection{Clearing Hooks}
 % \DescribeMacro\ClearHook\AlsoMacro{At...Of...}<argument(s) of hook macro>
-% Using\marginpar{New in v0.5 2011/01/07} this macro existing hooks can be globally cleared, i.e.\ set to empty.
+% Using\marginpar{New in v0.5 2011/01/09} this macro existing hooks can be globally cleared, i.e.\ set to empty.
 % This should be used with care because it will also remove all (user level) hook code set
 % by packages into this hook.
 % Note that the special hook code installed by the packages \pkg{currfile} and \pkg{svn-multi}
