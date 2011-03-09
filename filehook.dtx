@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2033 2011-01-09 17:14:37Z martin $
+%% $Id: filehook.dtx 2252 2011-03-09 19:21:15Z martin $
 % \fi
 %
 % \iffalse
@@ -29,7 +29,7 @@
 %<package>\NeedsTeXFormat{LaTeX2e}[1999/12/01]
 %<package>\ProvidesPackage{filehook}
 %<*package>
-    [2011/01/09 v0.5 Hooks for input files]
+    [2011/03/09 v0.5a Hooks for input files]
 %</package>
 %
 %<*driver>
@@ -60,7 +60,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{976}
+% \CheckSum{977}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -96,6 +96,7 @@
 % Updated documentation.
 % }
 % \changes{v0.5}{2011/01/09}{Added PGF key interface for hooks. Added macro to clear hooks.}
+% \changes{v0.5a}{2011/03/09}{Added required \string\long\space to an internal macro.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -239,7 +240,7 @@
 % \DescribeMacro{\AtEndOfFiles}{<\TeX\ code>}
 % These macros add the given \marg{code} to two hooks executed for all files read using the \Macro\InputIfFileExists macro. This macro is used internally by the 
 % \Macro\input, \Macro\include and \Macro\usepackage/\Macro\RequirePackage macros. Packages and classes might use it to include additional or auxiliary files.
-% Authors can exclude those files from the hooks by using the following code instead:\\\hspace*{\bigskipamount}\Macro\IfFileExists{<file name>}|{\@input\@filef@und}{}|
+% Authors can exclude those files from the hooks by using the following code instead:\\\hspace*{\bigskipamount}\Macro\IfFileExists{<file name>}'{\@input\@filef@und}{}'
 %
 % \DescribeMacro{\AtBeginOfFile}{<file name>}{<\TeX\ code>}
 % \DescribeMacro{\AtEndOfFile}{<file name>}{<\TeX\ code>}
@@ -968,9 +969,9 @@
 %
 % \begin{macro}{\AtEndOfXFile@normal}[2]{extension}{name}
 % Note that \Macro\AtEndOfClass is identical to \Macro\AtEndOfPackage, so no
-% differenciation between classes and packages is needed here.
+% differentiation between classes and packages is needed here.
 %    \begin{macrocode}
-\def\AtEndOfXFile@normal#1#2#3{%
+\long\def\AtEndOfXFile@normal#1#2#3{%
     \AtEndOfFile{#2.#1}{\AtEndOfPackage{#3}}%
 }
 %    \end{macrocode}
