@@ -19,7 +19,7 @@
 %% This work consists of the files filehook.dtx, filehook.ins
 %% and the derived file filehook.sty.
 %%
-%% $Id: filehook.dtx 2357 2011-03-19 15:41:45Z martin $
+%% $Id: filehook.dtx 2504 2011-07-18 17:22:50Z martin $
 % \fi
 %
 % \iffalse
@@ -55,7 +55,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{977}
+% \CheckSum{989}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -518,11 +518,20 @@
 % \subsection{Initialisation of Hooks}
 % The general hooks are initialised to call the file specific hooks.
 %
+%
+%    \begin{macrocode}
+\@ifpackageloaded{etoolbox}{%
+    \let\filehook@csuse\csuse
+}{%
+    \def\filehook@csuse{\ifcsname #1\endcsname\csname #1\expandafter\endcsname\fi}
+}
+%    \end{macrocode}
+%
 % \begin{macro}{\filehook@include@atbegin}
 %    \begin{macrocode}
 \def\filehook@include@atbegin#1{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
-  \@nameuse{\filehook@include@atbegin@#1}%
+  \filehook@csuse{\filehook@include@atbegin@#1}%
   \filehook@include@@atbegin
 }
 %    \end{macrocode}
@@ -538,7 +547,7 @@
 %    \begin{macrocode}
 \def\filehook@include@atend#1{%
   \filehook@include@@atend
-  \@nameuse{\filehook@include@atend@#1}%
+  \filehook@csuse{\filehook@include@atend@#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -553,7 +562,7 @@
 %    \begin{macrocode}
 \def\filehook@include@after#1{%
   \filehook@include@@after
-  \@nameuse{\filehook@include@after@#1}%
+  \filehook@csuse{\filehook@include@after@#1}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -568,7 +577,7 @@
 %    \begin{macrocode}
 \def\filehook@input@atbegin#1{%
   \let\InputIfFileExists\filehook@@InputIfFileExists
-  \@nameuse{\filehook@input@atbegin@\filehook@ensureext{#1}}%
+  \filehook@csuse{\filehook@input@atbegin@\filehook@ensureext{#1}}%
   \filehook@input@@atbegin
 }
 %    \end{macrocode}
@@ -584,7 +593,7 @@
 %    \begin{macrocode}
 \def\filehook@input@atend#1{%
   \filehook@input@@atend
-  \@nameuse{\filehook@input@atend@\filehook@ensureext{#1}}%
+  \filehook@csuse{\filehook@input@atend@\filehook@ensureext{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -598,7 +607,7 @@
 % \begin{macro}{\filehook@atbegin}
 %    \begin{macrocode}
 \def\filehook@atbegin#1{%
-  \@nameuse{\filehook@atbegin@\filehook@ensureext{#1}}%
+  \filehook@csuse{\filehook@atbegin@\filehook@ensureext{#1}}%
   \filehook@@atbegin
 }
 %    \end{macrocode}
@@ -614,7 +623,7 @@
 %    \begin{macrocode}
 \def\filehook@atend#1{%
   \filehook@@atend
-  \@nameuse{\filehook@atend@\filehook@ensureext{#1}}%
+  \filehook@csuse{\filehook@atend@\filehook@ensureext{#1}}%
 }
 %    \end{macrocode}
 % \end{macro}
