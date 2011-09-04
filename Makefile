@@ -1,4 +1,17 @@
 PACKAGE=filehook
+CONTRIBUTION  = ${PACKAGE}
+NAME          = Martin Scharrer
+EMAIL         = martin@scharrer-online.de
+DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
+DONOTANNOUNCE = 0
+LICENSE       = free
+FREEVERSION   = lppl
+FILE          = /tmp/${CONTRIBUTION}.tar.gz
+export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION FILE
+
+upload: ctanify
+	ctanupload -p
+
 MV=mv
 LATEX=pdflatex
 
