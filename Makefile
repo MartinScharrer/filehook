@@ -3,10 +3,9 @@ CONTRIBUTION  = ${PACKAGE}
 NAME          = Martin Scharrer
 EMAIL         = martin@scharrer-online.de
 DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
-DONOTANNOUNCE = 0
 LICENSE       = free
 FREEVERSION   = lppl
-FILE          = /tmp/${CONTRIBUTION}.tar.gz
+FILE          = ${CONTRIBUTION}.tar.gz
 export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION FILE
 
 upload: ctanify
@@ -14,6 +13,7 @@ upload: ctanify
 
 MV=mv
 LATEX=pdflatex
+TEXMF=${HOME}/texmf
 
 all: package doc
 
@@ -38,10 +38,10 @@ ctanify: ${PACKAGE}.dtx ${PACKAGE}.ins ${PACKAGE}.pdf README Makefile
 clean:
 	latexmk -C ${PACKAGE}.dtx
 
-install: package doc
-	-@mkdir -p ${HOME}/texmf/tex/latex/filehook/ 2>/dev/null || true
-	-@mkdir -p ${HOME}/texmf/doc/latex/filehook/ 2>/dev/null || true
-	@cp -v ${PACKAGE}*.sty ${HOME}/texmf/tex/latex/filehook/
-	@cp -v ${PACKAGE}.pdf ${HOME}/texmf/doc/latex/filehook/
+install: ctanify
+	@-mkdir .install
+	tar -xz -C .install -f ${FILE}
+	cd .install && unzip ${CONTRIBUTION}.tds.zip -d ${TEXMF} 
 	texhash ${HOME}/texmf
+	${RM} .install
 
