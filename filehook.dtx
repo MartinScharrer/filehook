@@ -524,7 +524,7 @@
 \@ifpackageloaded{etoolbox}{%
     \let\filehook@csuse\csuse
 }{%
-    \def\filehook@csuse{\ifcsname #1\endcsname\csname #1\expandafter\endcsname\fi}
+    \def\filehook@csuse#1{\ifcsname #1\endcsname\csname #1\expandafter\endcsname\fi}
 }
 %    \end{macrocode}
 %
