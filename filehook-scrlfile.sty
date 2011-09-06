@@ -1,0 +1,124 @@
+%
+%    \begin{macrocode}
+\ProvidesPackage{filehook-scrlfile}[2011/01/03 v0.1 filehook patch for scrlfile package]
+\RequirePackage{filehook}
+\begingroup
+%    \end{macrocode}
+%
+% \begin{macro}{\scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\scrlfile@InputIfFileExists#1#2{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
+    \expandafter\@firstoftwo
+  \fi
+  {%
+    \expandafter\InputIfFileExists\expandafter{\csname
+      #1-@alias\endcsname}{#2}%
+  }%
+  {\IfFileExists{#1}{%
+      \scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \@@input \@filef@und
+      \scr@load@hook{after}{#1}%
+    }}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\filehook@scrlfile@InputIfFileExists#1#2{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
+    \expandafter\@firstoftwo
+  \fi
+  {%
+    \expandafter\InputIfFileExists\expandafter{\csname
+      #1-@alias\endcsname}{#2}%
+  }%
+  {\IfFileExists{#1}{%
+      \expandafter\filehook@swap
+      \expandafter{\@filef@und}%
+      {\scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \filehook@every@atbegin{#1}%
+      \filehook@atbegin{#1}%
+      \@@input}%
+      \filehook@atend{#1}%
+      \filehook@every@atend{#1}%
+      \scr@load@hook{after}{#1}%
+    }}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@@scrlfile@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\filehook@@scrlfile@InputIfFileExists#1#2{%
+  \let\InputIfFileExists\filehook@InputIfFileExists
+  \begingroup\expandafter\expandafter\expandafter\endgroup
+  \expandafter\ifx\csname #1-@alias\endcsname\relax
+    \expandafter\@secondoftwo
+  \else
+    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
+    \expandafter\@firstoftwo
+  \fi
+  {%
+    \expandafter\InputIfFileExists\expandafter{\csname
+      #1-@alias\endcsname}{#2}%
+  }%
+  {\IfFileExists{#1}{%
+      \expandafter\filehook@swap
+      \expandafter{\@filef@und}%
+      {\scr@load@hook{before}{#1}%
+      #2\@addtofilelist{#1}%
+      \filehook@atbegin{#1}%
+      \@@input}%
+      \filehook@atend{#1}%
+      \scr@load@hook{after}{#1}%
+    }}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% If the |scrlfile| package definition is detected the |filehook|s are added
+% to that definition. Unfortunately the \Macro\scr@load@hook{before} hook is placed \emph{before}
+% not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
+% Note that this will stop working if |scrlfile| ever changes its definition of the \Macro\InputIfFileExists macro.
+%    \begin{macrocode}
+\ifcase
+    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\scrlfile@InputIfFileExists 0\else
+     1%
+    \fi\fi
+\relax
+  \global\let\filehook@InputIfFileExists\filehook@scrlfile@InputIfFileExists
+  \global\let\filehook@@InputIfFileExists\filehook@@scrlfile@InputIfFileExists
+  \global\let\InputIfFileExists\filehook@InputIfFileExists
+  \PackageInfo{filehook}{Package 'scrlfile' detected and compensated for}%
+\else
+  \iffilehook@force
+    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+    \global\let\InputIfFileExists\filehook@InputIfFileExists
+    \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
+                              The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
+  \else
+    \PackageError{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
+  \fi
+\fi
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\endgroup
+%    \end{macrocode}
+%
+%

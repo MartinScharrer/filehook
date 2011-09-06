@@ -1,5 +1,4 @@
-PACKAGE=filehook
-CONTRIBUTION  = ${PACKAGE}
+CONTRIBUTION  = filehook
 NAME          = Martin Scharrer
 EMAIL         = martin@scharrer-online.de
 DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
@@ -8,40 +7,69 @@ FREEVERSION   = lppl
 FILE          = ${CONTRIBUTION}.tar.gz
 export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION FILE
 
-upload: ctanify
+
+SRCFILES = ${CONTRIBUTION}.sty filehook-scrlfile.sty filehook-memoir.sty filehook-listings.sty filehook-fink.sty pgf-filehook.sty
+DOCFILES = ${CONTRIBUTION}.pdf README
+
+
+TEXMF = ${HOME}/texmf
+
+LATEXMK = latexmk -pdf
+
+.PHONY: all upload doc clean install uninstall build
+
+all: doc
+
+${FILE}: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.sty README ${CONTRIBUTION}.pdf
+	${MAKE} --no-print-directory build
+
+upload: ${FILE}
 	ctanupload -p
 
-MV=mv
-LATEX=pdflatex
-TEXMF=${HOME}/texmf
+doc: ${CONTRIBUTION}.pdf
 
-all: package doc
+${CONTRIBUTION}.pdf: ${CONTRIBUTION}.dtx ${CONTRIBUTION}.sty ${CONTRIBUTION}.ins
+	${MAKE} --no-print-directory build
 
-package: ${PACKAGE}.sty
+BUILDDIR = build
 
-doc: ${PACKAGE}.pdf
-
-${PACKAGE}.sty: ${PACKAGE}.ins ${PACKAGE}.dtx
-	yes | pdflatex $<
-
-%.pdf: %.dtx %.sty
-	${LATEX} $*.dtx
-	-makeindex -s gind.ist -o $*.ind $*.idx
-	-makeindex -s gglo.ist -o $*.gls $*.glo
-	${LATEX} $*.dtx
-	${LATEX} $*.dtx
-
-ctanify: ${PACKAGE}.dtx ${PACKAGE}.ins ${PACKAGE}.pdf README Makefile
-	-pdfopt ${PACKAGE}.pdf temp.pdf && ${MV} temp.pdf ${PACKAGE}.pdf
-	ctanify $^
+build:
+	-mkdir ${BUILDDIR} 2>/dev/null || true
+	cp ${CONTRIBUTION}.ins README ${BUILDDIR}/
+	tex '\input ydocincl\relax\includefiles{${CONTRIBUTION}.dtx}{${BUILDDIR}/${CONTRIBUTION}.dtx}' && ${RM} ydocincl.log
+	cd ${BUILDDIR} && tex ${CONTRIBUTION}.ins
+	cd ${BUILDDIR} && ${LATEXMK} ${CONTRIBUTION}.dtx
+	cd ${BUILDDIR} && ctanify ${CONTRIBUTION}.dtx ${CONTRIBUTION}.ins ${CONTRIBUTION}.sty README ${CONTRIBUTION}.pdf
+	cd ${BUILDDIR} && cp ${CONTRIBUTION}.tar.gz ${CONTRIBUTION}.pdf ..
 
 clean:
-	latexmk -C ${PACKAGE}.dtx
+	latexmk -C ${CONTRIBUTION}.dtx
+	@${RM} ${CONTRIBUTION}.cod ${CONTRIBUTION}.glo ${CONTRIBUTION}.gls ${CONTRIBUTION}.exa ${CONTRIBUTION}.log ${CONTRIBUTION}.aux
+	${RM} -r build ${FILE}
 
-install: ctanify
-	@-mkdir .install
-	tar -xz -C .install -f ${FILE}
-	cd .install && unzip ${CONTRIBUTION}.tds.zip -d ${TEXMF} 
-	texhash ${HOME}/texmf
-	${RM} .install
+
+distclean:
+	latexmk -c ${CONTRIBUTION}.dtx
+	@${RM} ${CONTRIBUTION}.cod ${CONTRIBUTION}.glo ${CONTRIBUTION}.gls ${CONTRIBUTION}.exa ${CONTRIBUTION}.log ${CONTRIBUTION}.aux
+	${RM} -r build
+
+
+install: ${CONTRIBUTION}.pdf ${CONTRIBUTION}.sty
+	-@mkdir ${TEXMF}/tex/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	-@mkdir ${TEXMF}/doc/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	cp ${SRCFILES} ${TEXMF}/tex/latex/${CONTRIBUTION}/
+	cp ${DOCFILES} ${TEXMF}/doc/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
+
+
+installsymlinks:
+	-@mkdir ${TEXMF}/tex/latex/${CONTRIBUTION}/ 2>/dev/null || true
+	-cd ${TEXMF}/tex/latex/${CONTRIBUTION}/ && ${RM} ${SRCFILES}
+	ln -s ${SRCFILES} ${TEXMF}/tex/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
+
+
+uninstall:
+	${RM} ${TEXMF}/tex/latex/${CONTRIBUTION}/ ${TEXMF}/doc/latex/${CONTRIBUTION}/
+	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
 

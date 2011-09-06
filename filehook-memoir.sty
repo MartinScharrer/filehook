@@ -1,0 +1,50 @@
+%
+%    \begin{macrocode}
+\ProvidesPackage{filehook-memoir}[2011/01/03 v0.1 filehook patch for memoir class]
+\RequirePackage{filehook}
+\begingroup
+%    \end{macrocode}
+%
+% \begin{macro}{\memoir@InputIfFileExists}
+%    \begin{macrocode}
+\long\def\memoir@InputIfFileExists#1#2{%
+  \IfFileExists{#1}%
+    {#2\@addtofilelist{#1}\m@matbeginf{#1}%
+     \@@input \@filef@und
+     \m@matendf{#1}%
+     \killm@matf{#1}}%
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\ifcase
+    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\memoir@InputIfFileExists 0\else
+     1%
+    \fi\fi
+\relax
+  \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+  \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+  \global\let\InputIfFileExists\filehook@InputIfFileExists
+  \filehook@appendwarg\filehook@atbegin{\m@matbeginf{#1}}%
+  \filehook@prefixwarg\filehook@atend{\m@matendf{#1}\killm@matf{#1}}%
+  \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the `At...OfFiles' hooks}
+\else
+  \iffilehook@force
+    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+    \global\let\InputIfFileExists\filehook@InputIfFileExists
+    \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
+                              The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
+  \else
+    \PackageError{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
+  \fi
+\fi
+%    \end{macrocode}
+%
+%    \begin{macrocode}
+\endgroup
+%    \end{macrocode}
+%
