@@ -710,3 +710,79 @@
 %    \end{macrocode}
 % \end{macro}
 %
+%
+% \begin{macro}{\InputIfFileExists}
+% First we test for the |scrlfile| package. The test macro adds the necessary patches if so.
+% In order to also support it when it is loaded afterwards the two hooks below are used to revert the definition
+% before the package and patch it afterwards.
+%    \begin{macrocode}
+\AtBeginOfPackageFile*{scrlfile}{%
+   \let\InputIfFileExists\latex@InputIfFileExists
+}%
+\AtEndOfPackageFile*{scrlfile}{%
+   \RequirePackage{filehook-scrlfile}%
+}%
+%    \end{macrocode}
+% Fink:
+%    \begin{macrocode}
+\AtBeginOfPackageFile*{fink}{%
+   \RequirePackage{kvoptions}%
+   \begingroup
+   \let\InputIfFileExists\latex@InputIfFileExists
+}%
+\AtEndOfPackageFile*{fink}{%
+   \edef\@tempa{\noexpand\PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}}%
+   \expandafter\endgroup\@tempa
+   \RequirePackage{filehook-fink}%
+}%
+%    \end{macrocode}
+% If |memoir| is detected its hooks
+% are added to the appropriate `At...OfFiles' hooks. This works fine because its hooks have the
+% exact same position. Please note that the case when |memoir| is used together with |scrlfile| is not explicitly covered.
+% In this case the |scrlfile| package will overwrite |memoir|s definition.
+%    \begin{macrocode}
+\AtBeginOfClassFile*{memoir}{%
+  \let\filehook@@InputIfFileExists\latex@InputIfFileExists
+  \let\InputIfFileExists\latex@InputIfFileExists
+  \let\@iinput\filehook@orig@@iinput
+}%
+\AtEndOfClassFile*{memoir}{%
+  \let\@iinput\filehook@@iinput
+  \RequirePackage{filehook-memoir}%
+}%
+%    \end{macrocode}
+% Finally, if no specific alternate definition is detected the original \LaTeX\ definition is checked for and a
+% error is given if any other unknown definition is detected.
+% The \opt{force} option will change the error into a warning and overwrite the macro with the default.
+%    \begin{macrocode}
+\ifcase
+    \ifx\InputIfFileExists\filehook@InputIfFileExists 0\else
+    \ifx\InputIfFileExists\latex@InputIfFileExists 1\else
+    \iffilehook@force 1\else
+    9%
+    \fi\fi\fi
+\relax% 0
+\or% 1
+    \let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
+    \let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
+    \let\InputIfFileExists\filehook@InputIfFileExists
+    \iffilehook@force
+      \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
+                                The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
+    \fi
+\else
+    \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
+                            Use the 'force' option of 'filehook' to overwrite it.}{}%
+\fi
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\AtBeginDocument{%
+    \ifx\InputIfFileExists\filehook@InputIfFileExists\else
+        \PackageWarning{filehook}{Macro \string\InputIfFileExists\space got redefined after 'filehook' was loaded.^^J%
+                                  Certain file hooks might now be dysfunctional!}
+    \fi
+}
+%    \end{macrocode}
+%
