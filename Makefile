@@ -65,7 +65,7 @@ install: ${CONTRIBUTION}.pdf ${CONTRIBUTION}.sty
 installsymlinks:
 	-@mkdir ${TEXMF}/tex/latex/${CONTRIBUTION}/ 2>/dev/null || true
 	-cd ${TEXMF}/tex/latex/${CONTRIBUTION}/ && ${RM} ${SRCFILES}
-	ln -s ${SRCFILES} ${TEXMF}/tex/latex/${CONTRIBUTION}/
+	ln -s $(addprefix ${PWD}/,${SRCFILES}) ${TEXMF}/tex/latex/${CONTRIBUTION}/
 	test -f ${TEXMF}/ls-R && texhash ${TEXMF}
 
 
