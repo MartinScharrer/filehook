@@ -1,7 +1,7 @@
 %    \begin{macrocode}
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
 \ProvidesPackage{filehook}
-    [2011/07/18 v0.5b Hooks for input files]
+    [2011/10/07 v0.5c Hooks for input files]
 %    \end{macrocode}
 %
 % \subsection{Options}
@@ -17,13 +17,21 @@
 % The general hooks are initialised to call the file specific hooks.
 %
 %
+% \begin{macro}{\filehook@csuse}
 %    \begin{macrocode}
-\@ifpackageloaded{etoolbox}{%
-    \let\filehook@csuse\csuse
-}{%
-    \def\filehook@csuse#1{\ifcsname #1\endcsname\csname #1\expandafter\endcsname\fi}
-}
+\begingroup
+\expandafter\ifx\csname csuse\endcsname\relax
+    \expandafter\ifx\csname ifcsname\endcsname\relax
+        \gdef\filehook@csuse#1{\expandafter\ifx\csname #1\endcsname\relax\else\csname #1\expandafter\endcsname\fi}
+    \else
+        \gdef\filehook@csuse#1{\ifcsname #1\endcsname\csname #1\expandafter\endcsname\fi}
+    \fi
+\else
+    \global\let\filehook@csuse\csuse
+\fi
+\endgroup
 %    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}{\filehook@include@atbegin}
 %    \begin{macrocode}
