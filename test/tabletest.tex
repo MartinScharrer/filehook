@@ -1,0 +1,16 @@
+\documentclass{article}
+\usepackage{filecontents}
+
+\begin{filecontents*}{\jobname-in.tex}
+    \\
+\end{filecontents*}
+
+\usepackage{filehook}
+
+\begin{document}
+\fbox{%
+\begin{tabular}{c |}
+    a \input{\jobname-in.tex}
+\end{tabular}%
+}
+\end{document}

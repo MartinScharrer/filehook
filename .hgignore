@@ -1,0 +1,11 @@
+syntax: glob
+build
+filehook.pdf
+*.bak
+*.orig
+*.tds.zip
+*.zip
+tds
+test/*.log
+test/*.aux
+test/*.pdf
