@@ -76,7 +76,7 @@ endif
 
 ${BUILDDIR}: ${MAINFILES}
 	-mkdir ${BUILDDIR} 2>/dev/null || true
-	cp ${MAINFILES} ${BUILDDIR}/
+	cp ${MAINFILES} README ${BUILDDIR}/
 	$(foreach DTX,${DTXFILES}, tex '\input ydocincl\relax\includefiles{${DTX}}{${BUILDDIR}/${DTX}}' && rm -f ydocincl.log;)
 	cd ${BUILDDIR}; $(foreach INS, ${INSFILES}, tex ${INS};)
 	cd ${BUILDDIR}; $(foreach DTX, ${MAINDTX}, ${LATEXMK} ${DTX};)
@@ -88,7 +88,7 @@ $(addprefix ${BUILDDIR}/,$(sort ${TDSFILES} ${CTANFILES})): ${MAINFILES}
 clean:
 	latexmk -C ${CONTRIBUTION}.dtx
 	${RM} ${CLEANFILES}
-	${RM} -r ${BUILDDIR} ${TDSDIR} ${CTAN_FILE}
+	${RM} -r ${BUILDDIR} ${TDSDIR} ${TDSZIP} ${CTAN_FILE}
 
 
 distclean:
