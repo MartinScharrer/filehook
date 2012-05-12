@@ -1,6 +1,6 @@
-CONTRIBUTION  = filehook
+CONTRIBUTION  = $(shell basename ${PWD})
 NAME          = Martin Scharrer
-EMAIL         = martin@scharrer-online.de
+EMAIL         = martin@scharrer.me
 DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
 LICENSE       = free
 FREEVERSION   = lppl
@@ -8,11 +8,12 @@ CTAN_FILE     = ${CONTRIBUTION}.zip
 export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION CTAN_FILE
 
 
-MAINDTX       = ${CONTRIBUTION}.dtx
-DTXFILES      = ${MAINDTX}
+MAINDTXS      = ${CONTRIBUTION}.dtx
+DTXFILES      = ${MAINDTXS}
 INSFILES      = ${CONTRIBUTION}.ins
-LTXFILES      = ${CONTRIBUTION}.sty filehook-fink.sty filehook-listings.sty filehook-memoir.sty filehook-scrlfile.sty pgf-filehook.sty
-LTXDOCFILES   = ${CONTRIBUTION}.pdf README
+LTXFILES      = ${CONTRIBUTION}.sty
+MAINPDFS      = ${CONTRIBUTION}.pdf
+LTXDOCFILES   = ${MAINPDFS} README
 LTXSRCFILES   = ${DTXFILES} ${INSFILES}
 PLAINFILES    = #${CONTRIBUTION}.tex
 PLAINDOCFILES = #${CONTRIBUTION}.?
@@ -55,7 +56,7 @@ BUILDDIR = build
 LATEXMK  = latexmk -pdf -quiet
 ZIP      = zip -r
 WEBBROWSER = firefox
-GETVERSION = $(strip $(shell grep '=\*VERSION' -A1 ${MAINDTX} | tail -n1))
+GETVERSION = $(strip $(shell grep '=\*VERSION' -A1 ${MAINDTXS} | tail -n1))
 
 AUXEXTS  = .aux .bbl .blg .cod .exa .fdb_latexmk .glo .gls .lof .log .lot .out .pdf .que .run.xml .sta .stp .svn .svt .toc
 CLEANFILES = $(addprefix ${CONTRIBUTION}, ${AUXEXTS})
@@ -64,9 +65,9 @@ CLEANFILES = $(addprefix ${CONTRIBUTION}, ${AUXEXTS})
 
 all: doc
 
-doc: ${CONTRIBUTION}.pdf
+doc: ${MAINPDFS}
 
-${CONTRIBUTION}.pdf: ${DTXFILES} README ${INSFILES} ${LTXFILES}
+${MAINPDFS}: ${DTXFILES} README ${INSFILES} ${LTXFILES}
 	${MAKE} --no-print-directory build
 	cp "${BUILDDIR}/$@" "$@"
 
@@ -76,10 +77,10 @@ endif
 
 ${BUILDDIR}: ${MAINFILES}
 	-mkdir ${BUILDDIR} 2>/dev/null || true
-	cp ${MAINFILES} README ${BUILDDIR}/
-	$(foreach DTX,${DTXFILES}, tex '\input ydocincl\relax\includefiles{${DTX}}{${BUILDDIR}/${DTX}}' && rm -f ydocincl.log;)
+	cp ${INSFILES} README ${BUILDDIR}/
+	$(foreach DTX,${MAINDTXS}, tex '\input ydocincl\relax\includefiles{${DTX}}{${BUILDDIR}/${DTX}}' && rm -f ydocincl.log;)
 	cd ${BUILDDIR}; $(foreach INS, ${INSFILES}, tex ${INS};)
-	cd ${BUILDDIR}; $(foreach DTX, ${MAINDTX}, ${LATEXMK} ${DTX};)
+	cd ${BUILDDIR}; $(foreach DTX, ${MAINDTXS}, ${LATEXMK} ${DTX};)
 	touch ${BUILDDIR}
 
 $(addprefix ${BUILDDIR}/,$(sort ${TDSFILES} ${CTANFILES})): ${MAINFILES}
@@ -96,65 +97,63 @@ distclean:
 	${RM} ${CLEANFILES}
 	${RM} -r ${BUILDDIR} ${TDSDIR}
 
+CPORLN=cp
 
-install: $(addprefix ${BUILDDIR}/,${TDSFILES})
+install: uninstall $(addprefix ${BUILDDIR}/,${TDSFILES})
 ifneq ($(strip $(LTXFILES)),)
 	test -d "${LTXDIR}" || mkdir -p "${LTXDIR}"
-	cd ${BUILDDIR} && cp ${LTXFILES} "$(abspath ${LTXDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/,${LTXFILES}) "$(abspath ${LTXDIR})"
 endif
 ifneq ($(strip $(LTXSRCFILES)),)
 	test -d "${LTXSRCDIR}" || mkdir -p "${LTXSRCDIR}"
-	cd ${BUILDDIR} && cp ${LTXSRCFILES} "$(abspath ${LTXSRCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${LTXSRCFILES}) "$(abspath ${LTXSRCDIR})"
 endif
 ifneq ($(strip $(LTXDOCFILES)),)
 	test -d "${LTXDOCDIR}" || mkdir -p "${LTXDOCDIR}"
-	cd ${BUILDDIR} && cp ${LTXDOCFILES} "$(abspath ${LTXDOCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${LTXDOCFILES}) "$(abspath ${LTXDOCDIR})"
 endif
 ifneq ($(strip $(GENERICFILES)),)
 	test -d "${GENERICDIR}" || mkdir -p "${GENERICDIR}"
-	cd ${BUILDDIR} && cp ${GENERICFILES} "$(abspath ${GENERICDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${GENERICFILES}) "$(abspath ${GENERICDIR})"
 endif
 ifneq ($(strip $(GENSRCFILES)),)
 	test -d "${GENSRCDIR}" || mkdir -p "${GENSRCDIR}"
-	cd ${BUILDDIR} && cp ${GENSRCFILES} "$(abspath ${GENSRCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${GENSRCFILES}) "$(abspath ${GENSRCDIR})"
 endif
 ifneq ($(strip $(GENDOCFILES)),)
 	test -d "${GENDOCDIR}" || mkdir -p "${GENDOCDIR}"
-	cd ${BUILDDIR} && cp ${GENDOCFILES} "$(abspath ${GENDOCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${GENDOCFILES}) "$(abspath ${GENDOCDIR})"
 endif
 ifneq ($(strip $(PLAINFILES)),)
 	test -d "${PLAINDIR}" || mkdir -p "${PLAINDIR}"
-	cd ${BUILDDIR} && cp ${PLAINFILES} "$(abspath ${PLAINDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${PLAINFILES}) "$(abspath ${PLAINDIR})"
 endif
 ifneq ($(strip $(PLAINSRCFILES)),)
 	test -d "${PLAINSRCDIR}" || mkdir -p "${PLAINSRCDIR}"
-	cd ${BUILDDIR} && cp ${PLAINSRCFILES} "$(abspath ${PLAINSRCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${PLAINSRCFILES}) "$(abspath ${PLAINSRCDIR})"
 endif
 ifneq ($(strip $(PLAINDOCFILES)),)
 	test -d "${PLAINDOCDIR}" || mkdir -p "${PLAINDOCDIR}"
-	cd ${BUILDDIR} && cp ${PLAINDOCFILES} "$(abspath ${PLAINDOCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${PLAINDOCFILES}) "$(abspath ${PLAINDOCDIR})"
 endif
 ifneq ($(strip $(SCRIPTFILES)),)
 	test -d "${SCRIPTDIR}" || mkdir -p "${SCRIPTDIR}"
-	cd ${BUILDDIR} && cp ${SCRIPTFILES} "$(abspath ${SCRIPTDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${SCRIPTFILES}) "$(abspath ${SCRIPTDIR})"
 endif
 ifneq ($(strip $(SCRDOCFILES)),)
 	test -d "${SCRDOCDIR}" || mkdir -p "${SCRDOCDIR}"
-	cd ${BUILDDIR} && cp ${SCRDOCFILES} "$(abspath ${SCRDOCDIR})"
+	${CPORLN} $(addprefix ${BUILDDIR}/, ${SCRDOCFILES}) "$(abspath ${SCRDOCDIR})"
 endif
 	touch ${TEXMF}
 	-test -f ${TEXMF}/ls-R && texhash ${TEXMF} || true
 
 
-installsymlinks:
-	test -d "${LTXDIR}" || mkdir -p "${LTXDIR}"
-	-cd ${LTXDIR} && ${RM} ${LTXFILES}
-	ln -s $(abspath ${LTXFILES}) ${LTXDIR}
-	-test -f ${TEXMF}/ls-R && texhash ${TEXMF} || true
-
+installsymlinks: CPORLN=ln -sf
+installsymlinks: BUILDDIR=${PWD}
+installsymlinks: install
 
 uninstall:
-	${RM} ${LTXDIR} ${LTXDOCDIR} ${LTXSRCDIR} \
+	${RM} -rf ${LTXDIR} ${LTXDOCDIR} ${LTXSRCDIR} \
 		${GENERICDIR} ${GENDOCDIR} ${GENSRCDIR} \
 		${PLAINDIR} ${PLAINDOCDIR} ${PLAINSRCDIR} \
 		${SCRIPTDIR} ${SCRDOCDIR}
