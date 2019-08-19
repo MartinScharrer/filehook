@@ -615,7 +615,7 @@
 \long\def\newlatex@InputIfFileExists#1#2{%
   \IfFileExists{#1}%
     {%
-  \expandafter\swap@args\expandafter
+  \expandafter\@swaptwoargs\expandafter
       {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}
 %    \end{macrocode}
 % \end{macro}
@@ -624,7 +624,7 @@
 % \begin{macro}{\latex@InputIfFileExists}
 % Standard \`LaTeX\ definition of \Macro\InputIfFileExists starting from LaTeX Kernal 2019/02/07 v1.1n.
 %    \begin{macrocode}
-\@ifundefined{swap@args}{%
+\@ifundefined{@swaptwoargs}{%
   \let\latex@InputIfFileExists\oldlatex@InputIfFileExists
 }{%
   \let\latex@InputIfFileExists\newlatex@InputIfFileExists
