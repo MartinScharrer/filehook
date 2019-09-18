@@ -596,15 +596,28 @@
 % This is always done inside a group to keep them temporary only.
 % The token register is used to avoid doubling of macro argument characters.
 %
+%    \begin{macrocode}
+\newif\iffilehook@newfmt
+\@ifl@t@r\fmtversion{2019/10/01}{\filehook@newfmttrue}{\filehook@newfmtfalse}
+%    \end{macrocode}
+%
 % \begin{macro}{\latex@InputIfFileExists}
 % Standard \LaTeX\ definition of \Macro\InputIfFileExists.
 %    \begin{macrocode}
+\iffilehook@newfmt
+\DeclareRobustCommand \latex@InputIfFileExists[2]{%
+  \IfFileExists{#1}%
+    {%
+  \expandafter\@swaptwoargs\expandafter
+      {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}
+\else
 \long\def\latex@InputIfFileExists#1#2{%
   \IfFileExists{#1}%
     {#2\@addtofilelist{#1}%
      \@@input\@filef@und
     }%
 }
+\fi
 %    \end{macrocode}
 % \end{macro}
 %
@@ -770,17 +783,37 @@
 % error is given if any other unknown definition is detected.
 % The \opt{force} option will change the error into a warning and overwrite the macro with the default.
 %    \begin{macrocode}
-\ifcase
-    \ifx\InputIfFileExists\filehook@InputIfFileExists 0\else
-    \ifx\InputIfFileExists\latex@InputIfFileExists 1\else
-    \iffilehook@force 1\else
-    9%
-    \fi\fi\fi
+\def\@tempa{9}%
+\ifx\InputIfFileExists\filehook@InputIfFileExists
+    \def\@tempa{0}%
+\else
+    \iffilehook@force
+        \def\@tempa{1}%
+    \else
+        \iffilehook@newfmt
+            % check if both the robust \InputIfFileExist and its internal macro match the default LaTeX definition
+            \edef\@tempb{\noexpand\protect\expandafter\noexpand\csname InputIfFileExists\space\endcsname}%
+            \ifx\InputIfFileExists\@tempb
+                \expandafter\ifx\csname InputIfFileExists\space\expandafter\endcsname\csname latex@InputIfFileExists\space\endcsname
+                    \def\@tempa{1}%
+                \fi
+            \fi
+        \else\ifx\InputIfFileExists\latex@InputIfFileExists
+            \def\@tempa{1}%
+        \fi
+    \fi
+\fi
+%
+\ifcase\@tempa
 \relax% 0
 \or% 1
     \let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
     \let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-    \let\InputIfFileExists\filehook@InputIfFileExists
+    \iffilehook@newfmt
+        \expandafter\let\csname InputIfFileExists\space\endcsname\filehook@InputIfFileExists
+    \else
+        \let\InputIfFileExists\filehook@InputIfFileExists
+    \fi
     \iffilehook@force
       \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
                                 The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
@@ -794,7 +827,9 @@
 %
 %    \begin{macrocode}
 \AtBeginDocument{%
-    \ifx\InputIfFileExists\filehook@InputIfFileExists\else
+    % Check if definition got changed again. For the new LaTeX format we check again \InputIfFileExists<space>,
+    % for the old format to \InputIfFileExists directly.
+    \expandafter\ifx\csname InputIfFileExists\iffilehook@newfmt\space\fi\endcsname\filehook@InputIfFileExists\else
         \PackageWarning{filehook}{Macro \string\InputIfFileExists\space got redefined after 'filehook' was loaded.^^J%
                                   Certain file hooks might now be dysfunctional!}
     \fi
