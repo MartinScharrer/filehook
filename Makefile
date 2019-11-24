@@ -1,4 +1,4 @@
-CONTRIBUTION  = $(shell basename ${PWD})
+CONTRIBUTION  = filehook
 NAME          = Martin Scharrer
 EMAIL         = martin@scharrer.me
 DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
