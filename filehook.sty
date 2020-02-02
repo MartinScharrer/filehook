@@ -18,10 +18,68 @@
 \ProcessOptions\relax
 %    \end{macrocode}
 %
+% \subsection{General stuff}
+%
+% \begin{macro}{\iffilehook@newfmt}
+%    \begin{macrocode}
+\newif\iffilehook@newfmt
+\@ifl@t@r\fmtversion{2019/10/01}{\filehook@newfmttrue}{\filehook@newfmtfalse}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@let}[2]{<macro name 1>}{<macro name 2>}
+%    \begin{macrocode}
+\def\filehook@let#1#2{%
+  \expandafter\ifx\csname #2\space\endcsname\relax
+    \expandafter\let\csname #1\expandafter\endcsname\csname #2\endcsname
+  \else
+    \expandafter\def\csname #1\expandafter\endcsname\expandafter{\expandafter\protect\csname #1\space\endcsname}%
+    \expandafter\let\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\filehook@glet}[2]{<macro name 1>}{<macro name 2>}
+%    \begin{macrocode}
+\def\filehook@glet#1#2{%
+  \expandafter\ifx\csname #1\space\endcsname\relax
+    \expandafter\global\expandafter\let\csname #1\expandafter\endcsname\csname #2\endcsname
+  \else
+    \expandafter\global\expandafter\def\csname #1\expandafter\endcsname\expandafter{\expandafter\protect\csname #1\space\endcsname}%
+    \expandafter\global\expandafter\let\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
+  \fi
+    \expandafter\global\expandafter\let\csname #1\expandafter\endcsname\csname #2\endcsname
+    \expandafter\global\expandafter\let\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
+}
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\filehook@cmp}[2]{<macro name 1>}{<macro name 2>}
+% Compare two macros definition including its space form in case of robust macros.
+%    \begin{macrocode}
+\def\filehook@cmp#1#2{%
+  \expandafter\ifx\csname #2\space\endcsname\relax
+    \expandafter\ifx\csname #1\expandafter\endcsname\csname #2\endcsname
+      \expandafter\expandafter\expandafter\@firstoftwo
+    \else
+      \expandafter\expandafter\expandafter\@secondoftwo
+    \fi
+  \else
+    \expandafter\ifx\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
+      \expandafter\expandafter\expandafter\@firstoftwo
+    \else
+      \expandafter\expandafter\expandafter\@secondoftwo
+    \fi
+  \fi
+}
+%    \end{macrocode}
+% \end{macro}
+%
 %
 % \subsection{Initialisation of Hooks}
 % The general hooks are initialised to call the file specific hooks.
-%
 %
 % \begin{macro}{\filehook@csuse}
 %    \begin{macrocode}
@@ -41,7 +99,7 @@
 % \begin{macro}{\filehook@include@atbegin}
 %    \begin{macrocode}
 \def\filehook@include@atbegin#1{%
-  \let\InputIfFileExists\filehook@@InputIfFileExists
+  \filehook@let{InputIfFileExists}{filehook@@InputIfFileExists}%
   \filehook@csuse{\filehook@include@atbegin@#1}%
   \filehook@include@@atbegin
 }
@@ -87,7 +145,7 @@
 % \begin{macro}{\filehook@input@atbegin}
 %    \begin{macrocode}
 \def\filehook@input@atbegin#1{%
-  \let\InputIfFileExists\filehook@@InputIfFileExists
+  \filehook@let{InputIfFileExists}{filehook@@InputIfFileExists}%
   \filehook@csuse{\filehook@input@atbegin@\filehook@ensureext{#1}}%
   \filehook@input@@atbegin
 }
@@ -596,20 +654,18 @@
 % This is always done inside a group to keep them temporary only.
 % The token register is used to avoid doubling of macro argument characters.
 %
-%    \begin{macrocode}
-\newif\iffilehook@newfmt
-\@ifl@t@r\fmtversion{2019/10/01}{\filehook@newfmttrue}{\filehook@newfmtfalse}
-%    \end{macrocode}
-%
 % \begin{macro}{\latex@InputIfFileExists}
 % Standard \LaTeX\ definition of \Macro\InputIfFileExists.
 %    \begin{macrocode}
 \iffilehook@newfmt
-\DeclareRobustCommand \latex@InputIfFileExists[2]{%
+\begingroup
+\DeclareRobustCommand \InputIfFileExists[2]{%
   \IfFileExists{#1}%
     {%
   \expandafter\@swaptwoargs\expandafter
       {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}
+\filehook@glet{latex@InputIfFileExists}{InputIfFileExists}%
+\endgroup
 \else
 \long\def\latex@InputIfFileExists#1#2{%
   \IfFileExists{#1}%
@@ -624,7 +680,7 @@
 %
 % \begin{macro}{\filehook@default@InputIfFileExists}
 %    \begin{macrocode}
-\long\gdef\filehook@default@InputIfFileExists#1#2{%
+\DeclareRobustCommand\filehook@default@InputIfFileExists[2]{%
   \IfFileExists{#1}%
     {\expandafter\filehook@swap
      \expandafter{\@filef@und}%
@@ -637,12 +693,16 @@
     }%
 }
 %    \end{macrocode}
+% Make sure definition is global:
+%    \begin{macrocode}
+\filehook@glet{filehook@default@InputIfFileExists}{filehook@default@InputIfFileExists}%
+%    \end{macrocode}
 % \end{macro}
 %
 % \begin{macro}{\filehook@@default@InputIfFileExists}
 %    \begin{macrocode}
-\long\gdef\filehook@@default@InputIfFileExists#1#2{%
-  \let\InputIfFileExists\filehook@InputIfFileExists
+\DeclareRobustCommand\filehook@@default@InputIfFileExists[2]{%
+  \filehook@let{InputIfFileExists}{filehook@InputIfFileExists}%
   \IfFileExists{#1}%
     {\expandafter\filehook@swap
      \expandafter{\@filef@und}%
@@ -653,88 +713,9 @@
     }%
 }
 %    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\scrlfile@InputIfFileExists}
+% Make sure definition is global:
 %    \begin{macrocode}
-\long\def\scrlfile@InputIfFileExists#1#2{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1-@alias\endcsname\relax
-    \expandafter\@secondoftwo
-  \else
-    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
-    \expandafter\@firstoftwo
-  \fi
-  {%
-    \expandafter\InputIfFileExists\expandafter{\csname
-      #1-@alias\endcsname}{#2}%
-  }%
-  {\IfFileExists{#1}{%
-      \scr@load@hook{before}{#1}%
-      #2\@addtofilelist{#1}%
-      \@@input \@filef@und
-      \scr@load@hook{after}{#1}%
-    }}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\filehook@scrlfile@InputIfFileExists}
-%    \begin{macrocode}
-\long\def\filehook@scrlfile@InputIfFileExists#1#2{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1-@alias\endcsname\relax
-    \expandafter\@secondoftwo
-  \else
-    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
-    \expandafter\@firstoftwo
-  \fi
-  {%
-    \expandafter\InputIfFileExists\expandafter{\csname
-      #1-@alias\endcsname}{#2}%
-  }%
-  {\IfFileExists{#1}{%
-      \expandafter\filehook@swap
-      \expandafter{\@filef@und}%
-      {\scr@load@hook{before}{#1}%
-      #2\@addtofilelist{#1}%
-      \filehook@every@atbegin{#1}%
-      \filehook@atbegin{#1}%
-      \@@input}%
-      \filehook@atend{#1}%
-      \filehook@every@atend{#1}%
-      \scr@load@hook{after}{#1}%
-    }}%
-}
-%    \end{macrocode}
-% \end{macro}
-%
-% \begin{macro}{\filehook@@scrlfile@InputIfFileExists}
-%    \begin{macrocode}
-\long\def\filehook@@scrlfile@InputIfFileExists#1#2{%
-  \let\InputIfFileExists\filehook@InputIfFileExists
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1-@alias\endcsname\relax
-    \expandafter\@secondoftwo
-  \else
-    \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
-    \expandafter\@firstoftwo
-  \fi
-  {%
-    \expandafter\InputIfFileExists\expandafter{\csname
-      #1-@alias\endcsname}{#2}%
-  }%
-  {\IfFileExists{#1}{%
-      \expandafter\filehook@swap
-      \expandafter{\@filef@und}%
-      {\scr@load@hook{before}{#1}%
-      #2\@addtofilelist{#1}%
-      \filehook@atbegin{#1}%
-      \@@input}%
-      \filehook@atend{#1}%
-      \scr@load@hook{after}{#1}%
-    }}%
-}
+\filehook@glet{filehook@@default@InputIfFileExists}{filehook@@default@InputIfFileExists}%
 %    \end{macrocode}
 % \end{macro}
 %
@@ -745,7 +726,7 @@
 % before the package and patch it afterwards.
 %    \begin{macrocode}
 \AtBeginOfPackageFile*{scrlfile}{%
-   \let\InputIfFileExists\latex@InputIfFileExists
+   \filehook@glet{InputIfFileExists}{latex@InputIfFileExists}%
 }%
 \AtEndOfPackageFile*{scrlfile}{%
    \RequirePackage{filehook-scrlfile}%
@@ -756,7 +737,7 @@
 \AtBeginOfPackageFile*{fink}{%
    \RequirePackage{kvoptions}%
    \begingroup
-   \let\InputIfFileExists\latex@InputIfFileExists
+   \filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
 }%
 \AtEndOfPackageFile*{fink}{%
    \edef\@tempa{\noexpand\PassOptionsToPackage{mainext=\fnk@mainext,maindir=\fnk@maindir}{currfile}}%
@@ -770,8 +751,8 @@
 % In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
 \AtBeginOfClassFile*{memoir}{%
-  \let\filehook@@InputIfFileExists\latex@InputIfFileExists
-  \let\InputIfFileExists\latex@InputIfFileExists
+  \filehook@let{filehook@@InputIfFileExists}{latex@InputIfFileExists}%
+  \filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
   \let\@iinput\filehook@orig@@iinput
 }%
 \AtEndOfClassFile*{memoir}{%
@@ -783,45 +764,28 @@
 % error is given if any other unknown definition is detected.
 % The \opt{force} option will change the error into a warning and overwrite the macro with the default.
 %    \begin{macrocode}
-\def\@tempa{9}%
-\ifx\InputIfFileExists\filehook@InputIfFileExists
-    \def\@tempa{0}%
-\else
-    \iffilehook@force
-        \def\@tempa{1}%
-    \else
-        \iffilehook@newfmt
-            % check if both the robust \InputIfFileExist and its internal macro match the default LaTeX definition
-            \edef\@tempb{\noexpand\protect\expandafter\noexpand\csname InputIfFileExists\space\endcsname}%
-            \ifx\InputIfFileExists\@tempb
-                \expandafter\ifx\csname InputIfFileExists\space\expandafter\endcsname\csname latex@InputIfFileExists\space\endcsname
-                    \def\@tempa{1}%
-                \fi
-            \fi
-        \else\ifx\InputIfFileExists\latex@InputIfFileExists
-            \def\@tempa{1}%
-        \fi\fi
-    \fi
-\fi
-%
-\ifcase\@tempa
-\relax% 0
-\or% 1
-    \let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
-    \let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-    \iffilehook@newfmt
-        \expandafter\let\csname InputIfFileExists\space\endcsname\filehook@InputIfFileExists
-    \else
-        \let\InputIfFileExists\filehook@InputIfFileExists
-    \fi
-    \iffilehook@force
-      \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
-                                The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
-    \fi
-\else
-    \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
-                            Use the 'force' option of 'filehook' to overwrite it.}{}%
-\fi
+\filehook@cmp{InputIfFileExists}{filehook@InputIfFileExists}%
+  {}% already set up
+  {%
+    \filehook@cmp{InputIfFileExists}{latex@InputIfFileExists}%
+      {%
+        \filehook@let{filehook@InputIfFileExists}{filehook@default@InputIfFileExists}%
+        \filehook@let{filehook@@InputIfFileExists}{filehook@@default@InputIfFileExists}%
+        \filehook@let{InputIfFileExists}{filehook@InputIfFileExists}%
+      }%
+      {%
+        \iffilehook@force
+          \filehook@let{filehook@InputIfFileExists}{filehook@default@InputIfFileExists}%
+          \filehook@let{filehook@@InputIfFileExists}{filehook@@default@InputIfFileExists}%
+          \filehook@let{InputIfFileExists}{filehook@InputIfFileExists}%
+          \PackageWarning{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
+                                    The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
+        \else
+          \PackageError{filehook}{Detected unknown definition of \string\InputIfFileExists.^^J%
+                                  Use the 'force' option of 'filehook' to overwrite it.}{}%
+        \fi
+      }%
+  }%
 %    \end{macrocode}
 % \end{macro}
 %
@@ -829,10 +793,10 @@
 \AtBeginDocument{%
     % Check if definition got changed again. For the new LaTeX format we check again \InputIfFileExists<space>,
     % for the old format to \InputIfFileExists directly.
-    \expandafter\ifx\csname InputIfFileExists\iffilehook@newfmt\space\fi\endcsname\filehook@InputIfFileExists\else
+    \filehook@cmp{InputIfFileExists}{filehook@InputIfFileExists}{}{%
         \PackageWarning{filehook}{Macro \string\InputIfFileExists\space got redefined after 'filehook' was loaded.^^J%
-                                  Certain file hooks might now be dysfunctional!}
-    \fi
+                                  Certain file hooks might now be dysfunctional!}%
+    }%
 }
 %    \end{macrocode}
 %
