@@ -1,7 +1,7 @@
 %    \begin{macrocode}
 %<!COPYRIGHT>
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesPackage{filehook-memoir}[2011/01/03 v0.1 filehook patch for memoir class]
+\ProvidesPackage{filehook-memoir}[2020/02/02 v0.2 filehook patch for memoir class]
 %    \end{macrocode}
 %
 %    \begin{macrocode}
@@ -10,35 +10,53 @@
 %    \end{macrocode}
 %
 % \begin{macro}{\memoir@InputIfFileExists}
+% The definition taken from memoir.cls. Copyright see there.
 %    \begin{macrocode}
-\long\def\memoir@InputIfFileExists#1#2{%
+\ifcsname InputIfFileExists\space\endcsname
+  \DeclareRobustCommand \memoir@InputIfFileExists[2]{%
+    \IfFileExists{#1}%
+    {%
+      \expandafter\@swaptwoargs\expandafter
+      {\@filef@und\m@matendf{#1}\killm@matf{#1}}{%
+        #2\@addtofilelist{#1}\m@matbeginf{#1}\@@input%
+      }%
+    }%
+  }
+\else
+  % Old definition
+\renewcommand{\memoir@InputIfFileExists}[2]{%
   \IfFileExists{#1}%
     {#2\@addtofilelist{#1}\m@matbeginf{#1}%
      \@@input \@filef@und
      \m@matendf{#1}%
      \killm@matf{#1}}%
 }
+\fi
 %    \end{macrocode}
 % \end{macro}
 %
 %    \begin{macrocode}
-\ifcase
-    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
-    \ifx\InputIfFileExists\memoir@InputIfFileExists 0\else
-     1%
-    \fi\fi
-\relax
-  \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
-  \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-  \global\let\InputIfFileExists\filehook@InputIfFileExists
+\@tempswafalse
+\filehook@cmp{InputIfFileExists}{filehook@InputIfFileExists}%
+  {\@tempswatrue}%
+  {%
+    \filehook@cmp{InputIfFileExists}{memoir@InputIfFileExists}%
+      {\@tempswatrue}%
+      {}%
+  }%
+
+\if@tempswa
+  \filehook@glet{filehook@InputIfFileExists}{filehook@default@InputIfFileExists}%
+  \filehook@glet{filehook@@InputIfFileExists}{filehook@@default@InputIfFileExists}%
+  \filehook@glet{InputIfFileExists}{filehook@InputIfFileExists}%
   \filehook@appendwarg\filehook@atbegin{\m@matbeginf{#1}}%
   \filehook@prefixwarg\filehook@atend{\m@matendf{#1}\killm@matf{#1}}%
   \PackageInfo{filehook}{Detected 'memoir' class: the memoir hooks will be moved to the `At...OfFiles' hooks}
 \else
   \iffilehook@force
-    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
-    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-    \global\let\InputIfFileExists\filehook@InputIfFileExists
+    \filehook@glet{filehook@InputIfFileExists}{filehook@default@InputIfFileExists}%
+    \filehook@glet{filehook@@InputIfFileExists}{filehook@@default@InputIfFileExists}%
+    \filehook@glet{InputIfFileExists}{filehook@InputIfFileExists}%
     \PackageWarning{filehook}{Detected 'memoir' class with unknown definition of \string\InputIfFileExists.^^J%
                               The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
   \else
