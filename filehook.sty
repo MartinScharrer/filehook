@@ -726,7 +726,7 @@
 % before the package and patch it afterwards.
 %    \begin{macrocode}
 \AtBeginOfPackageFile*{scrlfile}{%
-   \filehook@glet{InputIfFileExists}{latex@InputIfFileExists}%
+   %\filehook@glet{InputIfFileExists}{latex@InputIfFileExists}%
 }%
 \AtEndOfPackageFile*{scrlfile}{%
    \RequirePackage{filehook-scrlfile}%
@@ -751,8 +751,8 @@
 % In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
 \AtBeginOfClassFile*{memoir}{%
-  \filehook@let{filehook@@InputIfFileExists}{latex@InputIfFileExists}%
-  \filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
+  %\filehook@let{filehook@@InputIfFileExists}{latex@InputIfFileExists}%
+  %\filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
   \let\@iinput\filehook@orig@@iinput
 }%
 \AtEndOfClassFile*{memoir}{%

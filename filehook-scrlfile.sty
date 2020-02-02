@@ -1,38 +1,39 @@
 %    \begin{macrocode}
 %<!COPYRIGHT>
 \NeedsTeXFormat{LaTeX2e}[1999/12/01]
-\ProvidesPackage{filehook-scrlfile}[2011/01/03 v0.1 filehook patch for scrlfile package]
+\ProvidesPackage{filehook-scrlfile}[2020/02/02 v0.2 filehook patch for scrlfile package]
 \RequirePackage{filehook}
 \begingroup
 %    \end{macrocode}
 %
 % \begin{macro}{\scrlfile@InputIfFileExists}
 %    \begin{macrocode}
-\long\def\scrlfile@InputIfFileExists#1#2{%
-  \begingroup\expandafter\expandafter\expandafter\endgroup
-  \expandafter\ifx\csname #1-@alias\endcsname\relax
+\begingroup
+\DeclareRobustCommand\InputIfFileExists[2]{%
+  \begingroup\expandafter\expandafter\expandafter\endgroup 
+  \expandafter\ifx\csname #1-@alias\endcsname\relax 
     \expandafter\@secondoftwo
-  \else
+  \else 
     \scr@replacefile@msg{\csname #1-@alias\endcsname}{#1}%
     \expandafter\@firstoftwo
-  \fi
+  \fi 
   {%
     \expandafter\InputIfFileExists\expandafter{\csname
-      #1-@alias\endcsname}{#2}%
+	#1-@alias\endcsname}{#2}%
   }%
   {\IfFileExists{#1}{%
-      \scr@load@hook{before}{#1}%
-      #2\@addtofilelist{#1}%
-      \@@input \@filef@und
-      \scr@load@hook{after}{#1}%
-    }}%
+    \expandafter\scr@input@withhook\expandafter{\@filef@und}{#1}{#2}}%
+  }%
 }
+\filehook@glet{scrlfile@InputIfFileExists}{InputIfFileExists}%
+\endgroup
 %    \end{macrocode}
 % \end{macro}
 %
+%
 % \begin{macro}{\filehook@scrlfile@InputIfFileExists}
 %    \begin{macrocode}
-\long\def\filehook@scrlfile@InputIfFileExists#1#2{%
+\DeclareRobustCommand\filehook@scrlfile@InputIfFileExists[2]{%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
@@ -57,13 +58,15 @@
       \scr@load@hook{after}{#1}%
     }}%
 }
+\filehook@glet{filehook@scrlfile@InputIfFileExists}{filehook@scrlfile@InputIfFileExists}%
 %    \end{macrocode}
 % \end{macro}
 %
+%
 % \begin{macro}{\filehook@@scrlfile@InputIfFileExists}
 %    \begin{macrocode}
-\long\def\filehook@@scrlfile@InputIfFileExists#1#2{%
-  \let\InputIfFileExists\filehook@InputIfFileExists
+\DeclareRobustCommand\filehook@@scrlfile@InputIfFileExists[2]{%
+  \filehook@let{InputIfFileExists}{filehook@InputIfFileExists}%
   \begingroup\expandafter\expandafter\expandafter\endgroup
   \expandafter\ifx\csname #1-@alias\endcsname\relax
     \expandafter\@secondoftwo
@@ -86,6 +89,7 @@
       \scr@load@hook{after}{#1}%
     }}%
 }
+\filehook@glet{filehook@@scrlfile@InputIfFileExists}{filehook@@scrlfile@InputIfFileExists}%
 %    \end{macrocode}
 % \end{macro}
 %
@@ -94,21 +98,25 @@
 % not after the |#2\@addtofilelist{#1}| code. Otherwise the |filehook|s could simply be added to these hooks.
 % Note that this will stop working if |scrlfile| ever changes its definition of the \Macro\InputIfFileExists macro.
 %    \begin{macrocode}
-\ifcase
-    \ifx\InputIfFileExists\latex@InputIfFileExists 0\else
-    \ifx\InputIfFileExists\scrlfile@InputIfFileExists 0\else
-     1%
-    \fi\fi
-\relax
-  \global\let\filehook@InputIfFileExists\filehook@scrlfile@InputIfFileExists
-  \global\let\filehook@@InputIfFileExists\filehook@@scrlfile@InputIfFileExists
-  \global\let\InputIfFileExists\filehook@InputIfFileExists
+\@tempswafalse
+\filehook@cmp{InputIfFileExists}{filehook@InputIfFileExists}%
+  {\@tempswatrue}%
+  {%
+    \filehook@cmp{InputIfFileExists}{scrlfile@InputIfFileExists}%
+      {\@tempswatrue}%
+      {}%
+  }%
+
+\if@tempswa
+  \filehook@glet{filehook@InputIfFileExists}{filehook@scrlfile@InputIfFileExists}%
+  \filehook@glet{filehook@@InputIfFileExists}{filehook@@scrlfile@InputIfFileExists}%
+  \filehook@glet{InputIfFileExists}{filehook@InputIfFileExists}%
   \PackageInfo{filehook}{Package 'scrlfile' detected and compensated for}%
 \else
   \iffilehook@force
-    \global\let\filehook@InputIfFileExists\filehook@default@InputIfFileExists
-    \global\let\filehook@@InputIfFileExists\filehook@@default@InputIfFileExists
-    \global\let\InputIfFileExists\filehook@InputIfFileExists
+    \filehook@glet{filehook@InputIfFileExists}{filehook@scrlfile@InputIfFileExists}%
+    \filehook@glet{filehook@@InputIfFileExists}{filehook@@scrlfile@InputIfFileExists}%
+    \filehook@glet{InputIfFileExists}{filehook@InputIfFileExists}%
     \PackageWarning{filehook}{Detected 'scrlfile' package with unknown definition of \string\InputIfFileExists.^^J%
                               The 'force' option of 'filehook' is in effect. Macro is overwritten with default!}%
   \else
