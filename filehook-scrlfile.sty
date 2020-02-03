@@ -8,8 +8,10 @@
 %
 % \begin{macro}{\scrlfile@InputIfFileExists}
 %    \begin{macrocode}
-\begingroup
-\DeclareRobustCommand\InputIfFileExists[2]{%
+\expandafter\def\expandafter\sclrfile@InputIfFileExists\expandafter{%
+  \expandafter\protect\csname InputIfFileExists\space\endcsname
+}
+\expandafter\long\expandafter\def\csname scrlfile@InputIfFileExists\space\endcsname#1#2{%
   \begingroup\expandafter\expandafter\expandafter\endgroup 
   \expandafter\ifx\csname #1-@alias\endcsname\relax 
     \expandafter\@secondoftwo
@@ -25,8 +27,6 @@
     \expandafter\scr@input@withhook\expandafter{\@filef@und}{#1}{#2}}%
   }%
 }
-\filehook@glet{scrlfile@InputIfFileExists}{InputIfFileExists}%
-\endgroup
 %    \end{macrocode}
 % \end{macro}
 %

@@ -43,14 +43,12 @@
 % \begin{macro}{\filehook@glet}[2]{<macro name 1>}{<macro name 2>}
 %    \begin{macrocode}
 \def\filehook@glet#1#2{%
-  \expandafter\ifx\csname #1\space\endcsname\relax
+  \expandafter\ifx\csname #2\space\endcsname\relax
     \expandafter\global\expandafter\let\csname #1\expandafter\endcsname\csname #2\endcsname
   \else
     \expandafter\global\expandafter\def\csname #1\expandafter\endcsname\expandafter{\expandafter\protect\csname #1\space\endcsname}%
     \expandafter\global\expandafter\let\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
   \fi
-    \expandafter\global\expandafter\let\csname #1\expandafter\endcsname\csname #2\endcsname
-    \expandafter\global\expandafter\let\csname #1\space\expandafter\endcsname\csname #2\space\endcsname
 }
 %    \end{macrocode}
 % \end{macro}
@@ -658,14 +656,14 @@
 % Standard \LaTeX\ definition of \Macro\InputIfFileExists.
 %    \begin{macrocode}
 \iffilehook@newfmt
-\begingroup
-\DeclareRobustCommand \InputIfFileExists[2]{%
+\expandafter\def\expandafter\latex@InputIfFileExists\expandafter{%
+  \expandafter\protect\csname InputIfFileExists\space\endcsname
+}
+\expandafter\long\expandafter\def\csname latex@InputIfFileExists\space\endcsname#1#2{%
   \IfFileExists{#1}%
     {%
   \expandafter\@swaptwoargs\expandafter
       {\@filef@und}{#2\@addtofilelist{#1}\@@input}}}
-\filehook@glet{latex@InputIfFileExists}{InputIfFileExists}%
-\endgroup
 \else
 \long\def\latex@InputIfFileExists#1#2{%
   \IfFileExists{#1}%
@@ -725,8 +723,8 @@
 % In order to also support it when it is loaded afterwards the two hooks below are used to revert the definition
 % before the package and patch it afterwards.
 %    \begin{macrocode}
-\AtBeginOfPackageFile*{scrlfile}{%
-   %\filehook@glet{InputIfFileExists}{latex@InputIfFileExists}%
+\AtBeginOfPackageFile{scrlfile}{%
+   \filehook@glet{InputIfFileExists}{latex@InputIfFileExists}%
 }%
 \AtEndOfPackageFile*{scrlfile}{%
    \RequirePackage{filehook-scrlfile}%
