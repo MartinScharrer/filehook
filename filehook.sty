@@ -748,9 +748,8 @@
 % exact same position. Please note that the case when |memoir| is used together with |scrlfile| is not explicitly covered.
 % In this case the |scrlfile| package will overwrite |memoir|s definition.
 %    \begin{macrocode}
-\AtBeginOfClassFile*{memoir}{%
-  %\filehook@let{filehook@@InputIfFileExists}{latex@InputIfFileExists}%
-  %\filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
+\AtBeginOfClassFile{memoir}{%
+  \filehook@let{InputIfFileExists}{latex@InputIfFileExists}%
   \let\@iinput\filehook@orig@@iinput
 }%
 \AtEndOfClassFile*{memoir}{%
