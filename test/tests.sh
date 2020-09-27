@@ -8,6 +8,6 @@ for FILE in $TESTFILES
 do
     rm -f *.aux
     echo -en "${FILE//.tex}: "
-    pdflatex $FILE | grep ^RESULT:
+    pdflatex -interaction=nonstopmode $FILE | grep ^RESULT:
 done
 
