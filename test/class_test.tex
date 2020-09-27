@@ -1,4 +1,3 @@
-%&pdflatex
 \RequirePackage{filehooktest}
 
 \AtBeginOfClassFile{testclass}{\testmessage{At Begin Of Class File `testclass'}}
@@ -22,6 +21,7 @@
 \AtEndOfClassFile{testclass}{\testmessage{SHOULD NOT BE SHOWN: At End Of Class File `testclass' (after class)}}
 \AtEndOfClassFile*{testclass}{\testmessage{At End Of Class File `testclass' (star) (after class)}}
 
+\listfiles
 \begin{document}
 
 \reference{%
@@ -38,6 +38,10 @@ At End Of Class File `testclass' (star)
 At End Of Class File `testclass'
 
 At End Of Class File `testclass' (star) (after class)
+At Begin Of Every File
+At Begin Of Files
+At End Of Files
+At End Of Every File
 }%
 \endtest
 \end{document}
