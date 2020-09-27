@@ -11,7 +11,7 @@ export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE 
 MAINDTXS      = ${CONTRIBUTION}.dtx
 DTXFILES      = ${MAINDTXS}
 INSFILES      = ${CONTRIBUTION}.ins
-LTXFILES      = filehook.sty filehook-fink.sty filehook-listings.sty filehook-memoir.sty filehook-scrlfile.sty pgf-filehook.sty
+LTXFILES      = filehook.sty filehook-2020.sty filehook-2019.sty filehook-fink.sty filehook-listings.sty filehook-memoir.sty filehook-scrlfile.sty pgf-filehook.sty
 MAINPDFS      = ${CONTRIBUTION}.pdf
 LTXDOCFILES   = ${MAINPDFS} README
 LTXSRCFILES   = ${DTXFILES} ${INSFILES}
