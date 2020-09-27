@@ -33,3 +33,5 @@ syntax: glob
 ?
 build
 tds
+test/*.tmsg
+test/*.tref
