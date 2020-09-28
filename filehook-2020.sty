@@ -565,10 +565,25 @@
 %    \end{macrocode}
 % \end{macro}
 %
+% \begin{macro}{\filehook@set@CurrentFile}
+%    \begin{macrocode}
+\def\filehook@set@CurrentFile{%
+    \edef\filehook@CurrentFile{%
+        \ifx\CurrentFilePath\empty
+        \else
+            \CurrentFilePath/%
+        \fi
+        \CurrentFile
+    }%
+}
+%    \end{macrocode}
+% \end{macro}
+%
 % \begin{macro}{\Hook}
 %    \begin{macrocode}
 \AddToHook{include/before}{%
-    \filehook@include@atbegin{\CurrentFile}%
+    \filehook@set@CurrentFile
+    \filehook@include@atbegin{\filehook@CurrentFile}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -576,7 +591,8 @@
 % \begin{macro}{\Hook}
 %    \begin{macrocode}
 \AddToHook{include/end}{%
-    \filehook@include@atend{\CurrentFile}%
+    \filehook@set@CurrentFile
+    \filehook@include@atend{\filehook@CurrentFile}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -584,7 +600,8 @@
 % \begin{macro}{\Hook}
 %    \begin{macrocode}
 \AddToHook{include/after}{%
-    \filehook@include@after{\CurrentFile}%
+    \filehook@set@CurrentFile
+    \filehook@include@after{\filehook@CurrentFile}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -621,9 +638,10 @@
 % \begin{macro}{\Hook}
 %    \begin{macrocode}
 \AddToHook{file/before}{%
-    \filehook@every@atbegin{\CurrentFile}%
-    \filehook@istexfile\CurrentFile{\filehook@input@atbegin{\CurrentFile}}{}% 
-    \filehook@atbegin{\CurrentFile}%
+    \filehook@set@CurrentFile
+    \filehook@every@atbegin{\filehook@CurrentFile}%
+    \filehook@istexfile\filehook@CurrentFile{\filehook@input@atbegin{\filehook@CurrentFile}}{}% 
+    \filehook@atbegin{\filehook@CurrentFile}%
 }
 %    \end{macrocode}
 % \end{macro}
@@ -631,9 +649,10 @@
 % \begin{macro}{\Hook}
 %    \begin{macrocode}
 \AddToHook{file/after}{%
-    \filehook@atend{\CurrentFile}%
-    \filehook@istexfile\CurrentFile{\filehook@input@atend{\CurrentFile}}{}% 
-    \filehook@every@atend{\CurrentFile}%
+    \filehook@set@CurrentFile
+    \filehook@atend{\filehook@CurrentFile}%
+    \filehook@istexfile\filehook@CurrentFile{\filehook@input@atend{\filehook@CurrentFile}}{}% 
+    \filehook@every@atend{\filehook@CurrentFile}%
 }
 %    \end{macrocode}
 % \end{macro}
