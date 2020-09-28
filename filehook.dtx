@@ -26,10 +26,10 @@
 %<*driver>
 \ProvidesFile{filehook.dtx}[%
 %<=*DATE>
-    2020/02/03
+    2020/09/29
 %<=/DATE>
 %<=*VERSION>
-    v0.7
+    v0.8a
 %<=/VERSION>
     Hooks for input files]
 \documentclass{ydoc}
@@ -57,7 +57,7 @@
 %</driver>
 % \fi
 %
-% \CheckSum{1011}
+% \CheckSum{1494}
 %
 % \CharacterTable
 %  {Upper-case    \A\B\C\D\E\F\G\H\I\J\K\L\M\N\O\P\Q\R\S\T\U\V\W\X\Y\Z
@@ -100,6 +100,8 @@
 % \changes{v0.5e}{2019/08/19}{Fix for new LaTeX format.}
 % \changes{v0.6}{2019/10/03}{Fix for InputIfFileExists for LaTeX format 2019/10/01.}
 % \changes{v0.7}{2020/02/03}{Further fixes for InputIfFileExists for LaTeX format 2019/10/01.}
+% \changes{v0.8}{2020/09/27}{Support for LaTeX format 2020/10/01.}
+% \changes{v0.8a}{2020/09/29}{Further fixes for LaTeX format 2020/10/01.}
 %
 % \GetFileInfo{filehook.dtx}
 %
@@ -114,9 +116,24 @@
 % execute code at begin or the end of specific or all input files.
 % \end{abstract}
 %
+% \section{Changes due to new \LaTeX\ core hooks}
+% With the \LaTeX\ release 2020/10/01 file hooks are now provided by the \LaTeX\ core. This package has been adjusted to use these hooks
+% while trying to provide the same interface and behaviour than before. Simpler usages should work without any differences but advanced
+% usages which rely on the exact hook order and position might see some unwanted changes.
+% Users should try to use the \LaTeX\ hooks instead for new documents.
+% Please see \LaTeX\ core filehook documentation
+% \href{http://mirrors.ctan.org/macros/latex-dev/base/ltfilehook-doc.pdf}{\texttt{ltfilehook-doc}} for 
+% the new hook system.
+%
+% Support of other hooking systems in other packages and classes has been dropped as this package no longer installs own hooks.
+%
+% If this package is run under a \LaTeX\ release prior to 2020/10/01 the old implementation will be loaded.
+% For this switch two sub-packages \pkg{filehook-2019} and \pkg{filehook-2020} are used and loaded according to the \LaTeX\ release version.
+% Please do not load these packages directly as they might be changes or disappear on later releases.
+%
 %
 % \section{Introduction}
-% These package changes some internal \LaTeX{} macros used to load input files so that they include `hooks'.
+% These package (under \LaTeX\ prior 2020/10/01) changes some internal \LaTeX{} macros used to load input files so that they include `hooks'.
 % A hook is an (internal) macro executed at specific points. Normally it is initially empty, but can be extended using
 % an user level macro. The most common hook in \LaTeX{} is the `At-Begin-Document' hook. Code can be added to this hook
 % using \Macro\AtBeginDocument{<\TeX\ code>}.
