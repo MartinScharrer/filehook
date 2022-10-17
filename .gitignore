@@ -1,5 +1,3 @@
-.hgignore
-.svn
 *.aux
 *.bbl
 *.blg
@@ -30,7 +28,8 @@
 *.tar.gz
 *.tar.bz
 ?
-build
-tds
-test/*.tmsg
-test/*.tref
+/build
+/tds
+*.tmsg
+*.tref
+/filehook
